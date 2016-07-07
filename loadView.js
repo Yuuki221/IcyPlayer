@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 /** the module for view setting and parameter parsing 
  *	@ param (Current Version) 
  *  {Object} option
@@ -58,14 +57,3 @@ var viewSetting = function(option){
 		'svg' : svg
 	};
 };
-=======
-var viewSetting = function(view_option){
-	var setView = "test";
-	var options = view_option; // an array 
-	return {
-		'html' : setView,
-		'option': options
-	};
-};
-module.exports = viewSetting;
->>>>>>> 470c79feaaa91f7a05a77c0488a59b9620716c7a
