@@ -34,7 +34,7 @@
 
     var getSvg = function(type){
 			return '' + '<svg xmlns="http://www.w3.org/2000/svg" height="100%" width="100%" viewbox= "' + 
-			svg[type][0] + '"> <use></use> <path d=' + svg[type][1] + '></path></svg>';
+			svg[type][0] + '"> <use></use> <path d="' + svg[type][1] + '"></path></svg>';
 	};
 
 	/**
@@ -52,19 +52,53 @@
 	}; 
 
 	/**
-	 * function for all the progress bar updating 
-	 * @param {String} barType -> is it a volumn updater or a video progress updater
-	 * @param {Number} percentage 
-	 * @param {String} direction -> it is forwrad or backward 
-	 *
+	 * function getElementLeftView(element)
+	 * @param {Object} element 
+	 * @return {Number} the left position of the input element
 	 */
+	 var getElementLeftView = function(element){
+	 	var parentContainer = element.offsetParent; // the container
+	 	var realLeft = element.offsetLeft; // left position relative to the parent 
+	 	var scrollLeft = 0; 
+	 	if(!document.fullscreenElement && !document.mozFullScreenElement && 
+	 	   !document.webkitFullscreenElement && !document.msFullscreenElement ){
+	 		// recursively get the realLeft position of element
+	 		while(parentContainer!==null){
+	 			realLeft += parentContainer.offsetLeft;
+	 			parentContainer = parentContainer.offsetParent;
+	 		}
+	 	}else{
+	 		while(parentContainer!==null && parentContainer!=this.element){
+	 			realLeft += parentContainer.offsetLeft;
+	 			parentContainer = parentContainer.offsetParent;
+	 		}
+	 	}
+	 	scrollLeft = document.body.scrollLeft + document.documentElement.scrollLeft;
+	 	return realLeft - scrollLeft;
+	 };
 
-	var progUpdater = function(barType, percentage, direction){
-	 	percentage = percentage>0 ? percentage : 0;
-	 	percentage = percentage<1 ? percentage : 1;
-	 	this[barType].style[direction] = precentage*100 + '%';
-	};
- 	
+	 /**  
+	  *  fuction getElementTopView(element)
+	  *  @param {Object} element
+	  *  @return {Number} the top position of the input element 
+	  */
+	  var getElementTopView = function(element){
+	  	var parentContainer = element.offsetParent;
+	  	var realTop = element.offsetTop;
+	  	var scrollTop = 0;
+	  	if(!document.fullscreenElement && !document.mozFullScreenElement &&
+	  	   !document.webkitFullscreenElement && !document.msFullscreenElement){
+	  		while(parentContainer!==null){
+	  			realTop += parentContainer.offsetTop;
+	  			parentContainer = parentContainer.offsetParent;
+	  		}
+	  	}else{
+	  		while(parentContainer!==null && parentContainer!==this.element){
+	  			realTop +=parentContainer.offsetTop;
+	  			parentContainer = parentContainer.offsetParent;
+	  		}
+	  	}
+	  }; 
 	// start of Player's prototype 
 	
 	/** method load(); 
@@ -74,10 +108,22 @@
 		this.element.innerHTML = '<div class="icyplyr-video-wrap">' +
             '<!-- video source -->' + 
                 '<video class="icyplyr-video" width="320px" height="180px">' +
-                    '<source src="./sprite/1-hourWorkingBGM.mp4" type="video/mp4">' +
+                    '<source src="1-hourWorkingBGM.mp4" type="video/mp4">' +
                 '</video>'+
             '</div>' +
-            '<button class="play-button">' + this.color + '</button> ';
+            '<button class="play-button">' + this.color + '</button> ' + 
+            '<div class="icyplyr-volume">' + 
+						'<button class="icyplyr-volume-icon">' +
+							getSvg('volume-down') +
+						'</button>' + 
+						'<div class="icyplyr-volume-bar-wrap">' +
+							'<div class="icyplyr-volume-bar">' + 
+								'<div class="icyplyr-volume-inner" style="background: hotpink; width:35px; height: 5px; max-width: 200px;">' +
+									'<span class="icyplyr-volume-thumb"></span>' + 
+								'</div>' + 
+							'</div>' +
+						'</div>' +
+					'</div>';
 	};
 
 	/** initialized the player 
@@ -96,6 +142,25 @@
 			this.event[this.eventTypes[i]] = [];
 		}
 
+		/**
+		 * function for all the progress bar updating 
+		 * @param {String} barType -> is it a volumn updater or a video progress updater
+		 * @param {Number} percentage 
+		 * @param {String} direction -> it is forwrad or backward 
+		 *
+		 */
+
+		this.progUpdater = function(barType, percentage, direction){
+		 	percentage = percentage>0 ? percentage : 0;
+		 	percentage = percentage<1 ? percentage : 1;
+		 	// console.log(this.volumeBar);
+		 	 console.log(this);
+		 	this[barType + 'Bar'].style[direction] = percentage*100 + '%';
+		};
+
+		/**
+		 * function fro toggle the play button 
+		 */
 		this.toggle = function(){
 			//console.log("say!");
 			if(this.video.paused){
@@ -104,7 +169,11 @@
 				this.pause();
 			}
 		};
- 		// event trigger
+ 		/**
+ 		 * function for trigger events, 
+ 		 * default API event has priority
+ 		 * then will deal with customize bind event 
+ 		 */
 		this.trigger = function(type){
 			for(var j=0; j<this.event[type].length; i++) {
 				this.event[type][j]();
@@ -118,12 +187,91 @@
 		this.playButton = this.element.getElementsByClassName('play-button')[0];
 		this.fullButton = this.element.getElementsByClassName('icyplyr-full-icon')[0];
 		this.shouldPause = true;
+		// volume elements
+		var volumeEle = this.element.getElementsByClassName('icyplyr-volume')[0];
+		var volumeIcon = this.element.getElementsByClassName('icyplyr-volume-icon')[0];
+		var volumeBarOutest = this.element.getElementsByClassName('icyplyr-volume-bar-wrap')[0];
+		var volumeBarWrap = this.element.getElementsByClassName('icyplyr-volume-bar')[0];
+		this.volumeBar = this.element.getElementsByClassName('icyplyr-volume-inner')[0];
+		var VOLUME_BAR_PADDING = 0;
+		var VOLUME_BAR_LENGTH = 200;
 
 		// bind event listener to this 
 		this.playButton.addEventListener('click', function(){
 			this.toggle();
 		}.bind(this));
 
+		/**
+	 	 *	Control the volume 
+	 	 *
+	 	 */
+	 	// function for change volume icon: 
+		// loud, quiet and mute 
+		this.switchVolumeIcon = function(){
+			if(this.video.volume >= 0.8) {
+				volumeIcon.innerHTML = getSvg('volume-up');
+			}else if(this.video.volume > 0) {
+				volumeIcon.innerHTML = getSvg('volume-down');
+			}else{
+				volumeIcon.innerHTML = getSvg('volume-off');
+			}
+		};
+
+		// handle move the volume bar 
+		this.volumeMove = function(event){
+			var ev = event || window.event;
+			var movePercentage = (ev.clientX - getElementLeftView(volumeBarWrap)-VOLUME_BAR_PADDING)/VOLUME_BAR_LENGTH;
+			console.log(movePercentage);
+			movePercentage = movePercentage > 0? movePercentage : 0;
+			movePercentage = movePercentage < 1? movePercentage : 1;
+			console.log(this);// print document 
+			this.progUpdater('volume', movePercentage, 'width');
+			this.video.volume = movePercentage;
+			if(this.video.muted) this.video.muted = false;
+			this.switchVolumeIcon();
+		};
+
+		// unattach the event after the the mouseup on the volume bar 
+		// pass test 
+		this.volumeFinish = function(){
+			document.removeEventListener('mouseup', this.volmeFinish);
+			document.removeEventListener('mousemove', this.volumeMove);
+		};
+		// add EventListener to the volume icon 
+		// past test
+		volumeIcon.addEventListener('click', function(){
+			if(this.video.muted){
+				this.video.muted = false;
+				this.switchVolumeIcon();
+				this.progUpdater('volume', this.video.volume, 'width');
+			}else{
+				this.video.muted = true;
+				volumeIcon.innerHTML = getSvg('volume-off');
+				this.progUpdater('volume', 0, 'width');
+			}
+		}.bind(this));
+		// volumeBarOutest.addEventListener('click', function(){
+		// 	console.log(this);	
+		// }); // output the bar  
+		// volumeBarOutest.addEventListener('click', function(){
+		// 	this.volumeMove();	
+		// }.bind(this)); // the this.progUpdater is not defined 
+			//this.volumeMove.bind(this)); 
+
+		// add eventListner to volume area click event 
+		volumeBarOutest.addEventListener('click', function(e){
+			var ev = e || window.event;
+			var percentageChange = (ev.clientX - getElementLeftView(volumeBarWrap)-VOLUME_BAR_PADDING)/VOLUME_BAR_LENGTH;
+			this.video.volume = percentageChange;
+			this.progUpdater('volume', percentageChange, 'width');
+			if(this.video.muted) this.video.muted=false;
+			this.switchVolumeIcon();
+		}.bind(this));
+		// the event will be passed to addEventListener automatically
+		volumeBarOutest.addEventListener('mousedown', function(){
+			volumeBarOutest.addEventListener('mousemove',this.volumeMove.bind(this)); // the event been handled is mousemove 
+			volumeBarOutest.addEventListener('mouseup', this.volumeFinish.bind(this)); 
+		}.bind(this));
 	};
 
 	/** 
@@ -145,22 +293,27 @@
 	 *	Pause() method 
 	 */
 
-	 IcyPlayer.prototype.pause = function(){
+	IcyPlayer.prototype.pause = function(){
 	 	if(!this.shouldPause || this.ended){
 	 		this.shouldPause = true;
 	 		this.ended = false;
 
-	 		this.playButton.innerHTML = getSvg('pause');
+	 		this.playButton.innerHTML = getSvg('play');
 	 		this.video.pause();
 	 		this.trigger('pause');
 	 	}
-	 };
+	};
 
+	 /**
+	  *	 bindEvent() method, 
+	  *	 Designed for people who would like to attach event to specific event type, 
+	  *  But the API will handle the "defualt" event first, 
+	  *  Then hander the customize event. 
+	  */
 	IcyPlayer.prototype.bindEvent = function(name, func){
 		if(typeof func === 'function'){
 			this.event[name].push(func);
 		}
-	};
-				 
+	};				 
 	window.IcyPlayer = IcyPlayer;
 })();
