@@ -42,12 +42,14 @@
 	 * @param {Number} seconds 
 	 * @param {String} 00:00
 	 */ 
+	 // past test 
 	var formatTime = function(seconds){
-		var second = seconds%60;
+		var second = Math.floor(seconds%60);
 		// if there is only zero, then we append 0s to it 
-		if(second===0) second = '0' + second;
+		if(second<10) second = '0' + second;
 		// get the minute number in integer, take floor 
 		var minutes = Math.floor(seconds/60);
+		if(minutes<10) minutes = '0' + minutes;
 		return '' + minutes + ':' + second;
 	}; 
 
@@ -123,6 +125,30 @@
 								'</div>' + 
 							'</div>' +
 						'</div>' +
+					'</div>' +
+						'<br>' +
+						'<div class="icyplyr-drag-wrap" style="width:200px;">' + 
+							'<div class="icyplyr-play-drag" style="height:7px; width:0; background:blue;"></div>' + 
+						'</div>' + 
+						'<span class="icyplyr-drag-time">00:00</span>' +
+					'<div class="icyplyr-play-progress" style="width:200px;">' +
+						'<div class="icyplyr-play-progress-wrap" style="background : hotpink; height: 7px; width:0;">' +
+							'<div class="icyplyr-play-bar-wrap">' +
+								'<span class="icyplyr-play-bar-inner"></span>' +
+							'</div>' +
+						'</div>' +
+					'</div>' + 
+					'<div class="icyplyr-playtime">' + 
+						'<div class="icyplyr-playtime-bar">' +
+							'<span class="icyplyr-played">00:00</span>/<span class="icyplyr-totaltime">00:00</span>' +
+						'</div>' +
+					'</div>' +
+					'<div class="icyplyr-full">' + 
+						'<div class="icyplyr-full-wrap">' +
+							'<button class="icyplyr-full-icon">' +
+									getSvg('full') +
+							'</button>' +
+						'</div>' +
 					'</div>';
 	};
 
@@ -154,7 +180,7 @@
 		 	percentage = percentage>0 ? percentage : 0;
 		 	percentage = percentage<1 ? percentage : 1;
 		 	// console.log(this.volumeBar);
-		 	 console.log(this);
+		 	// console.log(this);
 		 	this[barType + 'Bar'].style[direction] = percentage*100 + '%';
 		};
 
@@ -195,6 +221,34 @@
 		this.volumeBar = this.element.getElementsByClassName('icyplyr-volume-inner')[0];
 		var VOLUME_BAR_PADDING = 0;
 		var VOLUME_BAR_LENGTH = 200;
+		// playprogress elements 
+		// show time elements 
+		this.dragTrackerBar = this.element.getElementsByClassName('icyplyr-play-drag')[0];
+		var playedTime = this.element.getElementsByClassName('icyplyr-played')[0];
+		var totalTime = this.element.getElementsByClassName('icyplyr-totaltime')[0];
+		var dragTime = this.element.getElementsByClassName('icyplyr-drag-time')[0];
+		// playprogress progress bar elements
+		var playprogressBar = this.element.getElementsByClassName('icyplyr-play-progress')[0];
+		this.playBar = this.element.getElementsByClassName('icyplyr-play-progress-wrap')[0];
+
+		// full screen button 
+		var fullscreenBtn = this.element.getElementsByClassName('icyplyr-full-wrap')[0];
+
+
+		/**
+		 * dealing with video events 
+		 */
+
+		this.ended = false;
+		this.video.addEventListener('ended', function(){
+			this.progUpdater('play', 1, 'width');
+			this.ended = true;
+			this.pause();
+			this.trigger('ended');
+		}.bind(this));
+		/**
+		 *  should continue dealing with ended events here 
+		 */
 
 		// bind event listener to this 
 		this.playButton.addEventListener('click', function(){
@@ -221,14 +275,15 @@
 		this.volumeMove = function(event){
 			var ev = event || window.event;
 			var movePercentage = (ev.clientX - getElementLeftView(volumeBarWrap)-VOLUME_BAR_PADDING)/VOLUME_BAR_LENGTH;
-			console.log(movePercentage);
+			// console.log(movePercentage);
 			movePercentage = movePercentage > 0? movePercentage : 0;
 			movePercentage = movePercentage < 1? movePercentage : 1;
-			console.log(this);// print document 
+			// console.log(this);// print document 
 			this.progUpdater('volume', movePercentage, 'width');
 			this.video.volume = movePercentage;
 			if(this.video.muted) this.video.muted = false;
 			this.switchVolumeIcon();
+			console.log("moving vol");
 		};
 
 		// unattach the event after the the mouseup on the volume bar 
@@ -250,15 +305,7 @@
 				this.progUpdater('volume', 0, 'width');
 			}
 		}.bind(this));
-		// volumeBarOutest.addEventListener('click', function(){
-		// 	console.log(this);	
-		// }); // output the bar  
-		// volumeBarOutest.addEventListener('click', function(){
-		// 	this.volumeMove();	
-		// }.bind(this)); // the this.progUpdater is not defined 
-			//this.volumeMove.bind(this)); 
-
-		// add eventListner to volume area click event 
+	
 		volumeBarOutest.addEventListener('click', function(e){
 			var ev = e || window.event;
 			var percentageChange = (ev.clientX - getElementLeftView(volumeBarWrap)-VOLUME_BAR_PADDING)/VOLUME_BAR_LENGTH;
@@ -272,6 +319,118 @@
 			volumeBarOutest.addEventListener('mousemove',this.volumeMove.bind(this)); // the event been handled is mousemove 
 			volumeBarOutest.addEventListener('mouseup', this.volumeFinish.bind(this)); 
 		}.bind(this));
+
+		/**
+		 * control play progress 
+		 *
+		 */
+		 // function to compute time played by the video 
+		var lastPlayPos = 0;
+		var currentPlayPos = 0;
+		var buffering = false;
+		// check if the the video is buffering and the playing status
+		this.detectPlayStatus = function(){
+			if(!this.video.paused && !this.video.ended){
+			this.detect = setInterval(function(){
+				currentPlayPos = this.video.currentTime;
+				// detect buffering 
+				if(!buffering && currentPlayPos<(lastPlayPos + 0.01) && !this.video.paused){ 
+					// the video is buffering for some reason 
+					buffering = true;
+				}
+				if(buffering && currentPlayPos > (lastPlayPos + 0.01) && this.video.paused){
+					// the video is playing 
+					buffering = false;
+				}
+				lastPlayPos = currentPlayPos;
+				playedTime.innerHTML = formatTime(currentPlayPos);
+				totalTime.innerHTML = formatTime(this.video.duration);
+				this.progUpdater('play', this.video.currentTime/this.video.duration, 'width');
+				this.trigger('playing');
+				console.log("tracking");
+			}.bind(this), 100);
+			}
+		}.bind(this);
+
+		// function to clear time when finishing playing 
+		this.clearTime = function(){
+			window.clearInterval(this.detect);
+			// console.log("cleared!");
+		};
+
+		// add event listener to the play-progree bar 
+		playprogressBar.addEventListener('click', function(e){
+			var ev = e || window.event;
+			var clickPoint = ev.clientX;
+			var barWidth = playprogressBar.clientWidth;
+			var playPercent = (clickPoint-getElementLeftView(this.playBar))/barWidth;
+			playPercent = playPercent > 0 ? playPercent : 0;
+			playPercent = playPercent < 1 ? playPercent : 1;
+			this.progUpdater('play', playPercent, 'width');
+			this.video.currentTime = playPercent*this.video.duration;
+			dragTime.innerHTML = formatTime(this.video.currentTime);
+			playedTime.innerHTML = formatTime(this.video.currentTime);
+			//dragTime = playPercent*this.video.duration;
+		}.bind(this));
+
+		// control the thumbMove events 
+		var thumbMove = function(event){
+			var ev = event || window.event;
+			var thumbPoint = ev.clientX;
+			var thumbPercent = (thumbPoint-getElementLeftView(this.playBar))/200;
+			//playprogressBar.clientWidth;
+			thumbPercent = thumbPercent>0 ? thumbPercent : 0;
+			thumbPercent = thumbPercent<1 ? thumbPercent : 1;
+			this.progUpdater('play', thumbPercent, 'width'); // update play while drag bar
+			dragTime.innerHTML = formatTime(thumbPercent*this.video.duration);// update the time of thumb place 
+			//console.log("moving");
+			//console.log(dragTime); 
+			// fix this later not showing number on the play time but on the cursor 
+		}.bind(this);
+
+		var thumbUp = function(){
+			document.removeEventListener('mouseup', thumbUp);
+			// console.log(window);
+			document.removeEventListener('mousemove', thumbMove);
+			this.video.currentTime = (parseFloat(this.playBar.style.width))/100*this.video.duration;
+			//console.log(this.playBar.style.width);
+			if(!this.video.paused && !this.video.ended) this.detectPlayStatus();
+		}.bind(this);
+
+		playprogressBar.addEventListener('mousedown', function(){
+			this.clearTime();
+			// console.log("clear mouseDown");
+			document.addEventListener('mousemove', thumbMove);
+			document.addEventListener('mouseup', thumbUp);
+		}.bind(this));
+		
+		/**
+		 * control fullscreen option 
+		 * lots of browser compatibility problem 
+		 */
+		 fullscreenBtn.addEventListener('click', function(){
+		 	if(!document.fullscreenElement && !document.mozFullScreenElement && !document.webkitFullscreenElement){
+		 		// if not set as a fullscreen element, then set it and deal with browser compatibility
+		 		if(this.element.requestFullscreen){
+		 			this.element.requestFullscreen();
+		 		}else if (this.element.mozRequestFullScreen){
+		 			this.element.mozRequestFullScreen();
+		 		}else if (this.element.webkitRequestFullscreen){
+		 			this.element.webkitRequestFullscreen();
+		 		}
+		 	}else{
+		 		// if it is already in full screen mode, then toggle it back to small window
+		 		if(document.exitFullscreen){
+		 			document.exitFullscreen();
+		 		}else if(document.mozCancelFullScreen){
+		 			document.mozCancelFullScreen();
+		 		}else if(document.msExitFullscreen){
+		 			document.msExitFullscreen();
+		 		}else if(document.webkitExitFullScreen){
+		 			document.webkitExitFullScreen();
+		 		}
+		 	}
+		 }.bind(this));
 	};
 
 	/** 
@@ -281,8 +440,11 @@
 		if(this.video.paused){
 			this.shouldPause = false;
 
-			this.playButton.innerHTML = getSvg('pause');
+			this.playButton.innerHTML = getSvg('play');
 			this.video.play();
+			// since the checking is removed when the video is paused
+			// we need to get it back when play it again 
+			this.detectPlayStatus();
 			this.trigger('play');
 		}
 		//var video = this.video; // make a local copy of the video 
@@ -298,18 +460,19 @@
 	 		this.shouldPause = true;
 	 		this.ended = false;
 
-	 		this.playButton.innerHTML = getSvg('play');
+	 		this.playButton.innerHTML = getSvg('pause');
 	 		this.video.pause();
+	 		this.clearTime(); 
+	 		// stop checking the status of playstatus when the video is stopped to be more efficient 
 	 		this.trigger('pause');
 	 	}
 	};
-
-	 /**
-	  *	 bindEvent() method, 
-	  *	 Designed for people who would like to attach event to specific event type, 
-	  *  But the API will handle the "defualt" event first, 
-	  *  Then hander the customize event. 
-	  */
+	/**
+	 *	 bindEvent() method, 
+	 *	 Designed for people who would like to attach event to specific event type, 
+	 *  But the API will handle the "defualt" event first, 
+	 *  Then hander the customize event. 
+	 */
 	IcyPlayer.prototype.bindEvent = function(name, func){
 		if(typeof func === 'function'){
 			this.event[name].push(func);
