@@ -143,12 +143,20 @@
 							'<span class="icyplyr-played">00:00</span>/<span class="icyplyr-totaltime">00:00</span>' +
 						'</div>' +
 					'</div>' +
+					'<div class="icyplyr-comment-outer">' + 
+						'<button class="icyplyr-comment-icon">' + 
+							getSvg('comment') + 
+						'<button>' +
+					'</div>' +
 					'<div class="icyplyr-full">' + 
 						'<div class="icyplyr-full-wrap">' +
 							'<button class="icyplyr-full-icon">' +
-									getSvg('full') +
+									getSvg('full') + 
 							'</button>' +
 						'</div>' +
+					'</div>' +
+					'<div class="icyplyr-comment-bar">' +
+						'<input type="text">press Enter to send comments</input>' + 
 					'</div>';
 	};
 
@@ -477,6 +485,97 @@
 		if(typeof func === 'function'){
 			this.event[name].push(func);
 		}
-	};				 
-	window.IcyPlayer = IcyPlayer;
+	};
+
+	/**
+	 *	control danmaku
+	 *
+	 */	
+	 var danContainer = this.element.getElementsByClassName('icyplyr-danmaku-container')[0];
+	 var danWidth;		 
+	 var DAN_HEIGHT = 30;
+	 var containerHeight;
+	 var containerWidth;
+	 var danPath = {
+	 	top : {},
+	 	fly : {},
+	 	bottom : {}
+	 }; // container to store danmaku 
+
+	 var danItemRight = function(elem){
+	 	return danContainer.getBoundingClientRect().right - elem.getBoudingClientRect().right;
+	 };
+
+	 var danSpeed = function(elem){
+	 	return (danWidth + elem.offsetWidth)/5;
+	 };
+	 // method dealing with danmaku position
+	 // change this method  
+	 var getPath = function(elem, type){
+	 	// first check if the path is empty now
+	 	for(var i=0; ;i++){
+	 		var old = danPath[type][i+''];
+	 		if( old && old.length){
+	 			for(var j=0; j<old.length; j++){
+	 				var danRight = danItemRight(old) - 10;
+	 				if(danRight<=0) break;
+	 				// when we reach the final one, 
+	 				// we push the new danmaku into path 
+	 				if(j===old.length-1){
+	 					danPath[type][i+''].push(elem);
+	 					ele.addEventListener('animationed', function(){
+	 						danPath[type][i+''].splice(0,1);
+	 					});
+	 					return i%itemY;
+	 				}
+	 			}
+	 		}else{
+	 			// if the path is empty right now. 
+	 			danPath[type][i+''].push(elem);
+	 			elem.addEventListener('animationed', function(){
+	 				danPath[type][i+''].splice(0,1);
+	 			});
+	 			return i%itemY;
+	 		}
+	 	}
+	 };
+
+	 this.danmakuBegin = function(text, color, pos){
+	 	var singleDan = document.createElement('<div>');
+	 	singleDan.innerHTML = text;
+	 	containerHeight = danContainer.offsetHeight;
+	 	containerWidth = danContainer.offsetWidth;
+	 	itemY = parseInt(containerHeight/DAN_HEIGHT);
+
+	 	// sent the danmaku 
+	 	danContainer.appendChild(item);
+	 	switch(pos){
+	 		case 'top':
+	 			singleDan.style.top = DAN_HEIGHT*getPath(singleDan, top) + 'px';
+	 			singleDan.addEventListener('animationed', function(){
+	 				danContainer.removeChild(singleDan);
+	 			});
+	 			break;
+	 		case 'right':
+	 			singleDan.style.top = DAN_HEIGHT*getPath(singleDan, right) + 'px';
+	 			singleDan.style.width = (singleDan.offsetWidth + 1) + 'px';
+	 			// move the item through the danContainer 
+	 			singleDan.style.transform = 'translateX' + '(-' + danWidth + 'px)';
+	 			singleDan.addEventListener('animationed', function(){
+	 				danContainer.removeChild(singleDan);
+	 			});
+	 			break;
+	 		case 'bottom':
+	 			singleDan.sytle.bottom = DAN_HEIGHT*getPath(singleDan, bottom) + 'px';
+	 			singleDan.addEventListener('animationed', function(){
+	 				danContainer.removeChild(singleDan);
+	 			});
+	 			break;
+	 		default:
+	 			console.error('Can not handle danmaku type ' + type);
+	 	}
+	 	// move the danmaku 
+	 	singleDan.classList.add('icyplyr-danmaku-move');
+	 };
+window.IcyPlayer = IcyPlayer;
 })();
