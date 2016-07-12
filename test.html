@@ -1,0 +1,91 @@
+<!doctype html>
+<html>
+	<head>
+		<title>Test This</title>
+		<!-- <script src="IcyPlayer.js"></script> -->
+	</head>
+	<body>
+		<div class="testarea">
+			<div class="icyplyr-video-wrap">
+             	<!-- video source -->
+                <video class="icyplyr-video" width="320px" height="180px">
+                    <source src="1-hourWorkingBGM.mp4" type="video/mp4">
+                </video>
+            </div>
+            <div class="icyplyr-danmaku"></div>
+            <div class="icyplyr-controller-maks"></div>
+            <div class="icyplyr-icons icyplyr-icons-left">
+	            <button class="play-button">
+	            	<svg xmlns="http://www.w3.org/2000/svg" height="100%" width="100%" viewbox= "0 0 16 32"> 
+						<use></use> 
+						<path d="M15.552 15.168q0.448 0.32 0.448 0.832 0 0.448-0.448 0.768l-13.696 8.512q-0.768 0.512-1.312 0.192t-0.544-1.28v-16.448q0-0.96 0.544-1.28t1.312 0.192z"></path>
+					</svg>
+	            </button>
+	            <div class="icyplyr-volume">
+					<button class="icyplyr-volume-icon">
+						<!-- getSvg('volume-down') -->
+						<svg xmlns="http://www.w3.org/2000/svg" height="100%" width="100%" viewbox= "0 0 21 32"> 
+							<use></use> 
+							<path d="M13.728 6.272v19.456q0 0.448-0.352 0.8t-0.8 0.32-0.8-0.32l-5.952-5.952h-4.672q-0.48 0-0.8-0.352t-0.352-0.8v-6.848q0-0.48 0.352-0.8t0.8-0.352h4.672l5.952-5.952q0.32-0.32 0.8-0.32t0.8 0.32 0.352 0.8zM20.576 16q0 1.344-0.768 2.528t-2.016 1.664q-0.16 0.096-0.448 0.096-0.448 0-0.8-0.32t-0.32-0.832q0-0.384 0.192-0.64t0.544-0.448 0.608-0.384 0.512-0.64 0.192-1.024-0.192-1.024-0.512-0.64-0.608-0.384-0.544-0.448-0.192-0.64q0-0.48 0.32-0.832t0.8-0.32q0.288 0 0.448 0.096 1.248 0.48 2.016 1.664t0.768 2.528z"></path>
+						</svg>
+					</button>
+					<div class="icyplyr-volume-bar-wrap">
+						<div class="icyplyr-volume-bar"> 
+							<div class="icyplyr-volume-inner" style="background: hotpink; width:35px; height: 5px; max-width: 200px;">
+								<span class="icyplyr-volume-thumb"></span>
+							</div>
+						</div>
+					</div>
+				</div>
+				<div class="icyplyr-drag-wrap" style="width:200px;">
+					<div class="icyplyr-play-drag" style="height:7px; width:0; background:blue;"></div>
+				</div>
+				<span class="icyplyr-drag-time">00:00</span>
+				<div class="icyplyr-play-progress" style="width:200px;">
+					<div class="icyplyr-play-progress-wrap" style="background : hotpink; height: 7px; width:0;">
+						<div class="icyplyr-play-bar-wrap">
+							<span class="icyplyr-play-bar-inner"></span>
+						</div>
+					</div>
+				</div>
+				<div class="icyplyr-playtime">
+					<div class="icyplyr-playtime-bar">
+						<span class="icyplyr-played">00:00</span>/<span class="icyplyr-totaltime">00:00</span>
+					</div>
+				</div>
+			</div>
+			<!-- end of the controller left part -->
+			<div class="icyplyr-icons icyplyr-icons-right"> 
+				<div class="icyplyr-comment-outer">
+					<button class="icyplyr-comment-icon">
+						<svg xmlns="http://www.w3.org/2000/svg" height="100%" width="100%" viewbox= "0 0 32 32">  
+							<path d="M27.128 0.38h-22.553c-2.336 0-4.229 1.825-4.229 4.076v16.273c0 2.251 1.893 4.076 4.229 4.076h4.229v-2.685h8.403l-8.784 8.072 1.566 1.44 7.429-6.827h9.71c2.335 0 4.229-1.825 4.229-4.076v-16.273c0-2.252-1.894-4.076-4.229-4.076zM28.538 19.403c0 1.5-1.262 2.717-2.819 2.717h-8.36l-0.076-0.070-0.076 0.070h-11.223c-1.557 0-2.819-1.217-2.819-2.717v-13.589c0-1.501 1.262-2.718 2.819-2.718h19.734c1.557 0 2.819-0.141 2.819 1.359v14.947zM9.206 10.557c-1.222 0-2.215 0.911-2.215 2.036s0.992 2.035 2.215 2.035c1.224 0 2.216-0.911 2.216-2.035s-0.992-2.036-2.216-2.036zM22.496 10.557c-1.224 0-2.215 0.911-2.215 2.036s0.991 2.035 2.215 2.035c1.224 0 2.215-0.911 2.215-2.035s-0.991-2.036-2.215-2.036zM15.852 10.557c-1.224 0-2.215 0.911-2.215 2.036s0.991 2.035 2.215 2.035c1.222 0 2.215-0.911 2.215-2.035s-0.992-2.036-2.215-2.036z"></path>
+						</svg>
+					<button>
+				</div>
+				<div class="icyplyr-full">
+					<div class="icyplyr-full-wrap">
+						<button class="icyplyr-full-icon">
+							<!-- getSvg('full') -->
+							<svg xmlns="http://www.w3.org/2000/svg" height="100%" width="100%" viewbox= "0 0 32 33"> 
+								<path d="M6.667 28h-5.333c-0.8 0-1.333-0.533-1.333-1.333v-5.333c0-0.8 0.533-1.333 1.333-1.333s1.333 0.533 1.333 1.333v4h4c0.8 0 1.333 0.533 1.333 1.333s-0.533 1.333-1.333 1.333zM30.667 28h-5.333c-0.8 0-1.333-0.533-1.333-1.333s0.533-1.333 1.333-1.333h4v-4c0-0.8 0.533-1.333 1.333-1.333s1.333 0.533 1.333 1.333v5.333c0 0.8-0.533 1.333-1.333 1.333zM30.667 12c-0.8 0-1.333-0.533-1.333-1.333v-4h-4c-0.8 0-1.333-0.533-1.333-1.333s0.533-1.333 1.333-1.333h5.333c0.8 0 1.333 0.533 1.333 1.333v5.333c0 0.8-0.533 1.333-1.333 1.333zM1.333 12c-0.8 0-1.333-0.533-1.333-1.333v-5.333c0-0.8 0.533-1.333 1.333-1.333h5.333c0.8 0 1.333 0.533 1.333 1.333s-0.533 1.333-1.333 1.333h-4v4c0 0.8-0.533 1.333-1.333 1.333z"></path>
+							</svg>
+						</button>
+					</div>
+				</div>
+			</div>
+			<!-- end of controller right part -->
+			<div class="icyplyr-comment-bar">
+				<input type="text">press Enter to send comments</input>
+			</div>
+		</div>
+		<script>
+			// var input = {
+			// 	element : document.getElementsByClassName('testarea')[0],
+			// 	color : 'hotpink'
+			// };
+			// var plyr = new IcyPlayer(input);
+			// plyr.init();
+		</script>
+	</body>
+</html>
