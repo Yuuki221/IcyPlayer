@@ -3,7 +3,12 @@
   overflow: hidden;
   user-select: none;
   line-height: 1;
-  min-width: 400px; }
+  min-width: 400px;
+  font-family: sans-serif;
+  font-weight: 100;
+  font-size: 12px; }
+  .icyplyr svg {
+    fill: #eee; }
   .icyplyr .plyr-icon {
     position: relative;
     width: 46px;
@@ -31,10 +36,16 @@
     .icyplyr .icyplyr-play-progress:hover .icyplyr-play-bar-inner {
       transform: scale(1);
       background-color: #aaa; }
+  .icyplyr .icyplyr-play-progress-wrap {
+    margin-top: 16px; }
   .icyplyr .icyplyr-controller {
     display: flex;
     flex-direction: row;
-    padding: 0 20px 0 5px; }
+    padding: 0 20px 0 5px;
+    background-color: #333;
+    color: #eee; }
+  .icyplyr .icyplyr-comment-icon {
+    top: 1.8px; }
   .icyplyr .icyplyr-volume {
     display: flex;
     flex-direction: row;
@@ -47,9 +58,9 @@
       display: none; }
   .icyplyr .icyplyr-playtime {
     display: inline-block;
-    margin: 0 20px 0 10px;
+    margin: 0 10px 0 10px;
     width: 100px;
-    padding-top: 10px; }
+    padding-top: 13px; }
     .icyplyr .icyplyr-playtime .playtime {
       padding: 10px 10px 0 0; }
   .icyplyr .icyplyr-video-wrap {

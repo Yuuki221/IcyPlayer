@@ -5,8 +5,14 @@
 	user-select: none;
 	line-height: 1;
 	min-width: 400px;
+	font-family: sans-serif;
+	font-weight: 100;
+	font-size: 12px;
 
-	// global icon setting 
+	// global icon setting
+	svg{
+		fill: #eee;
+	} 
 	.plyr-icon{
 		position: relative;
 		width: 46px;
@@ -42,11 +48,19 @@
 			}
 		}
 	}
+	.icyplyr-play-progress-wrap{
+		margin-top: 16px;
+	}
 
 	.icyplyr-controller{
 		display: flex;
 		flex-direction: row;
 		padding: 0 20px 0 5px;
+		background-color: #333;
+		color: #eee;
+	}
+	.icyplyr-comment-icon{
+		top: 1.8px;
 	}
 
 	.icyplyr-volume{
@@ -65,9 +79,9 @@
 	}
 	.icyplyr-playtime{
 		display: inline-block;
-		margin: 0 20px 0 10px;
+		margin: 0 10px 0 10px;
 		width: 100px;
-		padding-top: 10px;
+		padding-top: 13px;
 		.playtime{
 			padding: 10px 10px 0 0;
 		}

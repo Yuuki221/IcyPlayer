@@ -107,58 +107,64 @@
 	 *  load the view of player 
 	 */
 	IcyPlayer.prototype.load = function(){
-		this.element.innerHTML = '<div class="icyplyr-video-wrap">' +
-            '<!-- video source -->' + 
+		this.element.innerHTML = 
+			'<div class="icyplyr-video-wrap icyplyr">' +
+             	'<!-- video source -->' +
                 '<video class="icyplyr-video" width="320px" height="180px">' +
                     '<source src="1-hourWorkingBGM.mp4" type="video/mp4">' +
-                '</video>'+
-            '</div>' +
-            '<button class="play-button">' + this.color + '</button> ' + 
-            '<div class="icyplyr-volume">' + 
-						'<button class="icyplyr-volume-icon">' +
-							getSvg('volume-down') +
-						'</button>' + 
-						'<div class="icyplyr-volume-bar-wrap">' +
+                '</video>' +
+            '</div>'+
+            '<div class="icyplyr-danmaku"></div>' + 
+            '<div class="icyplyr-controller-maks"></div>' +
+            '<div class="icyplyr-controller">' + 
+            	'<button class="play-button plyr-icon">' + 
+	            			getSvg('play') +
+		    	'</button>' +
+		    	'<div class="icyplyr-volume">' +
+		            	'<div class="icyplyr-volume-control">' +
+							'<button class="plyr-icon icyplyr-volume-icon">' +
+								getSvg('volume-up') + 
+							'</button>' + 
+						'</div>' +
+						'<div class="icyplyr-volume-bar-wrap">' + 
 							'<div class="icyplyr-volume-bar">' + 
-								'<div class="icyplyr-volume-inner" style="background: hotpink; width:35px; height: 5px; max-width: 200px;">' +
-									'<span class="icyplyr-volume-thumb"></span>' + 
-								'</div>' + 
+								'<div class="icyplyr-volume-inner" style="background: hotpink; width:60px; height: 5px; max-width: 100px;">' +
+									'<span class="icyplyr-volume-thumb"></span>' +
+								'</div>' +
 							'</div>' +
 						'</div>' +
 					'</div>' +
-						'<br>' +
-						'<div class="icyplyr-drag-wrap" style="width:200px;">' + 
-							'<div class="icyplyr-play-drag" style="height:7px; width:0; background:blue;"></div>' + 
-						'</div>' + 
-						'<span class="icyplyr-drag-time">00:00</span>' +
-					'<div class="icyplyr-play-progress" style="width:200px;">' +
+					'<div class="icyplyr-play-progress">' +
 						'<div class="icyplyr-play-progress-wrap" style="background : hotpink; height: 7px; width:0;">' +
 							'<div class="icyplyr-play-bar-wrap">' +
 								'<span class="icyplyr-play-bar-inner"></span>' +
 							'</div>' +
 						'</div>' +
-					'</div>' + 
-					'<div class="icyplyr-playtime">' + 
+					'</div>' +
+					'<div class="icyplyr-playtime">' +
 						'<div class="icyplyr-playtime-bar">' +
-							'<span class="icyplyr-played">00:00</span>/<span class="icyplyr-totaltime">00:00</span>' +
+							'<span class="playtime"><span class="icyplyr-played">00:00</span>/<span class="icyplyr-totaltime">00:00</span></span>' +
 						'</div>' +
 					'</div>' +
-					'<div class="icyplyr-comment-outer">' + 
-						'<button class="icyplyr-comment-icon">' + 
+					'<div class="icyplyr-comment-outer">' +
+						'<div class="icyplyr-comment-wrap">' +
+						'<button class="plyr-icon icyplyr-comment-icon">' +
 							getSvg('comment') + 
-						'<button>' +
-					'</div>' +
-					'<div class="icyplyr-full">' + 
+						'</button>' + 
+						'</div>' +
+					'</div>' + 
+					'<div class="icyplyr-full">' +
 						'<div class="icyplyr-full-wrap">' +
-							'<button class="icyplyr-full-icon">' +
-									getSvg('full') + 
+							'<button class="plyr-icon icyplyr-full-icon">' + 
+								getSvg('full') +
 							'</button>' +
 						'</div>' +
-					'</div>' +
-					'<div class="icyplyr-comment-bar">' +
-						'<input type="text">press Enter to send comments</input>' + 
-					'</div>';
-	};
+					'</div>' + 
+				'</div>' +
+				'<div class="icyplyr-comment-bar">' + 
+				'<input type="text">press Enter to send comments</input>' + 
+			'</div>';
+};
 
 	/** initialized the player 
 	 *
@@ -355,7 +361,7 @@
 				totalTime.innerHTML = formatTime(this.video.duration);
 				this.progUpdater('play', this.video.currentTime/this.video.duration, 'width');
 				this.trigger('playing');
-				console.log("tracking");
+				// console.log("tracking");
 			}.bind(this), 100);
 			}
 		}.bind(this);
@@ -376,7 +382,7 @@
 			playPercent = playPercent < 1 ? playPercent : 1;
 			this.progUpdater('play', playPercent, 'width');
 			this.video.currentTime = playPercent*this.video.duration;
-			dragTime.innerHTML = formatTime(this.video.currentTime);
+			//dragTime.innerHTML = formatTime(this.video.currentTime);
 			playedTime.innerHTML = formatTime(this.video.currentTime);
 			//dragTime = playPercent*this.video.duration;
 		}.bind(this));
@@ -390,7 +396,7 @@
 			thumbPercent = thumbPercent>0 ? thumbPercent : 0;
 			thumbPercent = thumbPercent<1 ? thumbPercent : 1;
 			this.progUpdater('play', thumbPercent, 'width'); // update play while drag bar
-			dragTime.innerHTML = formatTime(thumbPercent*this.video.duration);// update the time of thumb place 
+			//dragTime.innerHTML = formatTime(thumbPercent*this.video.duration);// update the time of thumb place 
 			//console.log("moving");
 			//console.log(dragTime); 
 			// fix this later not showing number on the play time but on the cursor 
@@ -448,7 +454,7 @@
 		if(this.video.paused){
 			this.shouldPause = false;
 
-			this.playButton.innerHTML = getSvg('play');
+			this.playButton.innerHTML = getSvg('pause');
 			this.video.play();
 			// since the checking is removed when the video is paused
 			// we need to get it back when play it again 
@@ -468,7 +474,7 @@
 	 		this.shouldPause = true;
 	 		this.ended = false;
 
-	 		this.playButton.innerHTML = getSvg('pause');
+	 		this.playButton.innerHTML = getSvg('play');
 	 		this.video.pause();
 	 		this.clearTime(); 
 	 		// stop checking the status of playstatus when the video is stopped to be more efficient 
@@ -490,7 +496,8 @@
 	/**
 	 *	control danmaku
 	 *
-	 */	
+	 */
+	 /**	
 	 var danContainer = this.element.getElementsByClassName('icyplyr-danmaku-container')[0];
 	 var danWidth;		 
 	 var DAN_HEIGHT = 30;
@@ -577,5 +584,6 @@
 	 	// move the danmaku 
 	 	singleDan.classList.add('icyplyr-danmaku-move');
 	 };
+	 */
 window.IcyPlayer = IcyPlayer;
 })();
