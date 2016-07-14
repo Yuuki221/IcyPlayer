@@ -108,7 +108,8 @@
 	 */
 	IcyPlayer.prototype.load = function(){
 		this.element.innerHTML = 
-			'<div class="icyplyr-video-wrap icyplyr">' +
+		'<div class="icylpyr">' + 
+			'<div class="icyplyr-video-wrap">' +
              	'<!-- video source -->' +
                 '<video class="icyplyr-video" width="320px" height="180px">' +
                     '<source src="1-hourWorkingBGM.mp4" type="video/mp4">' +
@@ -121,50 +122,51 @@
 	            			getSvg('play') +
 		    	'</button>' +
 		    	'<div class="icyplyr-volume">' +
-		            	'<div class="icyplyr-volume-control">' +
-							'<button class="plyr-icon icyplyr-volume-icon">' +
-								getSvg('volume-up') + 
-							'</button>' + 
-						'</div>' +
-						'<div class="icyplyr-volume-bar-wrap">' + 
-							'<div class="icyplyr-volume-bar">' + 
-								'<div class="icyplyr-volume-inner" style="background: hotpink; width:60px; height: 5px; max-width: 100px;">' +
-									'<span class="icyplyr-volume-thumb"></span>' +
-								'</div>' +
+		           	'<div class="icyplyr-volume-control">' +
+						'<button class="plyr-icon icyplyr-volume-icon">' +
+							getSvg('volume-up') + 
+						'</button>' + 
+					'</div>' +
+					'<div class="icyplyr-volume-bar-wrap" style="min-width: 55px;">' + 
+						'<div class="icyplyr-volume-bar" style="min-width:55px;">' + 
+							'<div class="icyplyr-volume-inner" style="background: hotpink; width:0; height: 5px; max-width: 100px;">' +
+								'<span class="icyplyr-volume-thumb"></span>' +
 							'</div>' +
 						'</div>' +
 					'</div>' +
-					'<div class="icyplyr-play-progress">' +
+				'</div>' +
+				'<div class="icyplyr-play-progress" style="background-color: #aaa; height: 7px;">' +
 						'<div class="icyplyr-play-progress-wrap" style="background : hotpink; height: 7px; width:0;">' +
 							'<div class="icyplyr-play-bar-wrap">' +
 								'<span class="icyplyr-play-bar-inner"></span>' +
 							'</div>' +
 						'</div>' +
-					'</div>' +
-					'<div class="icyplyr-playtime">' +
-						'<div class="icyplyr-playtime-bar">' +
-							'<span class="playtime"><span class="icyplyr-played">00:00</span>/<span class="icyplyr-totaltime">00:00</span></span>' +
-						'</div>' +
-					'</div>' +
-					'<div class="icyplyr-comment-outer">' +
-						'<div class="icyplyr-comment-wrap">' +
-						'<button class="plyr-icon icyplyr-comment-icon">' +
-							getSvg('comment') + 
-						'</button>' + 
-						'</div>' +
-					'</div>' + 
-					'<div class="icyplyr-full">' +
-						'<div class="icyplyr-full-wrap">' +
-							'<button class="plyr-icon icyplyr-full-icon">' + 
-								getSvg('full') +
-							'</button>' +
-						'</div>' +
-					'</div>' + 
 				'</div>' +
-				'<div class="icyplyr-comment-bar">' + 
+				'<div class="icyplyr-playtime">' +
+					'<div class="icyplyr-playtime-bar">' +
+						'<span class="playtime"><span class="icyplyr-played">00:00</span>/<span class="icyplyr-totaltime">00:00</span></span>' +
+					'</div>' +
+				'</div>' +
+				'<div class="icyplyr-comment-outer">' +
+					'<div class="icyplyr-comment-wrap">' +
+					'<button class="plyr-icon icyplyr-comment-icon">' +
+						getSvg('comment') + 
+					'</button>' + 
+					'</div>' +
+				'</div>' + 
+				'<div class="icyplyr-full">' +
+					'<div class="icyplyr-full-wrap">' +
+						'<button class="plyr-icon icyplyr-full-icon">' + 
+							getSvg('full') +
+						'</button>' +
+					'</div>' +
+				'</div>' + 
+			'</div>' +
+			'<div class="icyplyr-comment-bar">' + 
 				'<input type="text">press Enter to send comments</input>' + 
-			'</div>';
-};
+			'</div>' +
+		'</div>';
+	};
 
 	/** initialized the player 
 	 *
@@ -234,7 +236,6 @@
 		var volumeBarWrap = this.element.getElementsByClassName('icyplyr-volume-bar')[0];
 		this.volumeBar = this.element.getElementsByClassName('icyplyr-volume-inner')[0];
 		var VOLUME_BAR_PADDING = 0;
-		var VOLUME_BAR_LENGTH = 200;
 		// playprogress elements 
 		// show time elements 
 		this.dragTrackerBar = this.element.getElementsByClassName('icyplyr-play-drag')[0];
@@ -286,26 +287,29 @@
 		};
 
 		// handle move the volume bar 
-		this.volumeMove = function(event){
+		var volumeMove = function(event){
 			var ev = event || window.event;
-			var movePercentage = (ev.clientX - getElementLeftView(volumeBarWrap)-VOLUME_BAR_PADDING)/VOLUME_BAR_LENGTH;
+			var VOLUME_BAR_LENGTH = document.getElementsByClassName('icyplyr-volume-bar')[0].clientWidth;
+			var movePercentage = (ev.clientX - getElementLeftView(volumeBarWrap)-3)/VOLUME_BAR_LENGTH;
 			// console.log(movePercentage);
 			movePercentage = movePercentage > 0? movePercentage : 0;
 			movePercentage = movePercentage < 1? movePercentage : 1;
 			// console.log(this);// print document 
+			console.log(movePercentage);
 			this.progUpdater('volume', movePercentage, 'width');
 			this.video.volume = movePercentage;
 			if(this.video.muted) this.video.muted = false;
 			this.switchVolumeIcon();
-			console.log("moving vol");
-		};
+			// console.log("moving vol");
+		}.bind(this);
 
 		// unattach the event after the the mouseup on the volume bar 
 		// pass test 
-		this.volumeFinish = function(){
-			document.removeEventListener('mouseup', this.volmeFinish);
-			document.removeEventListener('mousemove', this.volumeMove);
-		};
+		var volumeFinish = function(){
+			// console.log("removed volume");
+			document.removeEventListener('mouseup', volumeFinish);
+			document.removeEventListener('mousemove', volumeMove);
+		}.bind(this);
 		// add EventListener to the volume icon 
 		// past test
 		volumeIcon.addEventListener('click', function(){
@@ -319,19 +323,22 @@
 				this.progUpdater('volume', 0, 'width');
 			}
 		}.bind(this));
-	
-		volumeBarOutest.addEventListener('click', function(e){
+		volumeBarWrap.addEventListener('click', function(e){
 			var ev = e || window.event;
-			var percentageChange = (ev.clientX - getElementLeftView(volumeBarWrap)-VOLUME_BAR_PADDING)/VOLUME_BAR_LENGTH;
+			var VOLUME_BAR_LENGTH = document.getElementsByClassName('icyplyr-volume-bar')[0].clientWidth;
+			var percentageChange = (ev.clientX - getElementLeftView(volumeBarWrap))/VOLUME_BAR_LENGTH;
+			percentageChange = percentageChange > 0 ? percentageChange : 0;
+			percentageChange = percentageChange < 1 ? percentageChange : 1;
 			this.video.volume = percentageChange;
+			console.log(percentageChange);
 			this.progUpdater('volume', percentageChange, 'width');
 			if(this.video.muted) this.video.muted=false;
 			this.switchVolumeIcon();
 		}.bind(this));
 		// the event will be passed to addEventListener automatically
-		volumeBarOutest.addEventListener('mousedown', function(){
-			volumeBarOutest.addEventListener('mousemove',this.volumeMove.bind(this)); // the event been handled is mousemove 
-			volumeBarOutest.addEventListener('mouseup', this.volumeFinish.bind(this)); 
+		volumeBarWrap.addEventListener('mousedown', function(){
+			document.addEventListener('mousemove',volumeMove); // the event been handled is mousemove 
+			document.addEventListener('mouseup', volumeFinish); 
 		}.bind(this));
 
 		/**
@@ -391,7 +398,8 @@
 		var thumbMove = function(event){
 			var ev = event || window.event;
 			var thumbPoint = ev.clientX;
-			var thumbPercent = (thumbPoint-getElementLeftView(this.playBar))/200;
+			var barWidth = playprogressBar.clientWidth;
+			var thumbPercent = (thumbPoint-getElementLeftView(this.playBar))/barWidth;
 			//playprogressBar.clientWidth;
 			thumbPercent = thumbPercent>0 ? thumbPercent : 0;
 			thumbPercent = thumbPercent<1 ? thumbPercent : 1;
@@ -434,14 +442,18 @@
 		 		}
 		 	}else{
 		 		// if it is already in full screen mode, then toggle it back to small window
-		 		if(document.exitFullscreen){
-		 			document.exitFullscreen();
+		 		if(document.cancelFullscreen){
+		 			// console.log("worked 1");
+		 			document.cancelFullscreen();
 		 		}else if(document.mozCancelFullScreen){
+		 			// console.log("worked 2");
 		 			document.mozCancelFullScreen();
 		 		}else if(document.msExitFullscreen){
+		 			// console.log("worked 3");
 		 			document.msExitFullscreen();
-		 		}else if(document.webkitExitFullScreen){
-		 			document.webkitExitFullScreen();
+		 		}else if(document.webkitCancelFullScreen){
+		 			// console.log("worked 4");
+		 			document.webkitCancelFullScreen();
 		 		}
 		 	}
 		 }.bind(this));
@@ -453,7 +465,7 @@
 	IcyPlayer.prototype.play = function(){
 		if(this.video.paused){
 			this.shouldPause = false;
-
+			this.progUpdater('volume', this.video.volume, 'width');
 			this.playButton.innerHTML = getSvg('pause');
 			this.video.play();
 			// since the checking is removed when the video is paused
