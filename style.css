@@ -36,8 +36,8 @@
     .icyplyr .icyplyr-play-progress:hover .icyplyr-play-bar-inner {
       transform: scale(1);
       background-color: #aaa; }
-  .icyplyr .icyplyr-play-progress-wrap {
-    margin-top: 16px; }
+  .icyplyr .icyplyr-play-progress {
+    margin-top: 15px; }
   .icyplyr .icyplyr-controller {
     display: flex;
     flex-direction: row;
@@ -51,18 +51,18 @@
     flex-direction: row;
     margin-right: 10px; }
     .icyplyr .icyplyr-volume .icyplyr-volume-bar {
-      padding: 10px;
-      margin-top: 8px;
-      margin-right: 10px; }
+      margin-top: 17px; }
     .icyplyr .icyplyr-volume .icyplyr-drag-wrap {
       display: none; }
   .icyplyr .icyplyr-playtime {
     display: inline-block;
-    margin: 0 10px 0 10px;
+    margin: 0 0 0 0;
+    right: -5px;
+    text-align: center;
     width: 100px;
     padding-top: 13px; }
     .icyplyr .icyplyr-playtime .playtime {
-      padding: 10px 10px 0 0; }
+      padding: 10px 0 0 0; }
   .icyplyr .icyplyr-video-wrap {
     position: relative;
     width: 100%;
@@ -72,5 +72,24 @@
       height: 100%; }
   .icyplyr .icyplyr-comment-outer, .icyplyr .icyplyr-playtime {
     display: block; }
+  .icyplyr .play-button {
+    left: -5px; }
+  .icyplyr .icyplyr-volume-icon {
+    padding-left: 0;
+    padding-right: 0;
+    width: 46px;
+    left: -15px;
+    position: relative; }
+  .icyplyr .icyplyr-volume-bar {
+    background-color: #eee; }
+  .icyplyr .icyplyr-volume-control {
+    height: 38px;
+    width: 46px;
+    margin-right: 5px;
+    display: block; }
+
+.icyplyr:-webkit-full-screen {
+  width: 100%;
+  height: 100%; }
 
 /*# sourceMappingURL=style.css.map */
