@@ -115,7 +115,7 @@
                     '<source src="1-hourWorkingBGM.mp4" type="video/mp4">' +
                 '</video>' +
             '</div>'+
-            '<div class="icyplyr-danmaku"></div>' + 
+            '<div class="icyplyr-danmaku-container"></div>' + 
             '<div class="icyplyr-controller-maks"></div>' +
             '<div class="icyplyr-controller">' + 
             	'<button class="play-button plyr-icon">' + 
@@ -129,14 +129,14 @@
 					'</div>' +
 					'<div class="icyplyr-volume-bar-wrap" style="min-width: 55px;">' + 
 						'<div class="icyplyr-volume-bar" style="min-width:55px;">' + 
-							'<div class="icyplyr-volume-inner" style="background: hotpink; width:0; height: 5px; max-width: 100px;">' +
+							'<div class="icyplyr-volume-inner" style="background: #bbffff; width:0; height: 5px; max-width: 100px;">' +
 								'<span class="icyplyr-volume-thumb"></span>' +
 							'</div>' +
 						'</div>' +
 					'</div>' +
 				'</div>' +
 				'<div class="icyplyr-play-progress" style="background-color: #aaa; height: 7px;">' +
-						'<div class="icyplyr-play-progress-wrap" style="background : hotpink; height: 7px; width:0;">' +
+						'<div class="icyplyr-play-progress-wrap" style="background : #bbffff; height: 7px; width:0;">' +
 							'<div class="icyplyr-play-bar-wrap">' +
 								'<span class="icyplyr-play-bar-inner"></span>' +
 							'</div>' +
@@ -162,8 +162,24 @@
 					'</div>' +
 				'</div>' + 
 			'</div>' +
-			'<div class="icyplyr-comment-bar">' + 
-				'<input type="text">press Enter to send comments</input>' + 
+			'<div class="icyplyr-comment-out">' +
+				'<div class="icyplyr-comment-wrap">' + 
+					'<div class="icyplyr-comment-bar">' + 
+						'<input class="icyplyr-comment-input" name="comment-content" type="text">press Enter to send comments</input>' + 
+					'</div>' +
+					'<button class="icyplyr-comment-sendBtn">' +
+						getSvg('send') + 
+					'</button>' +
+					'</div>' + 
+					'<div class="icyplyr-comment-setting-wrap">' +
+						'<span class="comment-setting-label">' + 
+							'comment opacity:' +
+						'</span>' + 
+						'<div class="icyplyr-comment-opacitybar-wrap">' + 
+							'<span class="icyplyr-comment-opacity-thumb></span>' + 
+						'</div>' +
+					'</div>' + 
+				'</div>' + 
 			'</div>' +
 		'</div>';
 	};
@@ -509,7 +525,7 @@
 	 *	control danmaku
 	 *
 	 */
-	 /**	
+	 	
 	 var danContainer = this.element.getElementsByClassName('icyplyr-danmaku-container')[0];
 	 var danWidth;		 
 	 var DAN_HEIGHT = 30;
@@ -530,6 +546,11 @@
 	 };
 	 // method dealing with danmaku position
 	 // change this method  
+
+	 // for use in animateioned event 
+	 var animatePath = function(type, i){
+	 	danPath[type][i+''].splice(0,1);
+	 };
 	 var getPath = function(elem, type){
 	 	// first check if the path is empty now
 	 	for(var i=0; ;i++){
@@ -542,18 +563,14 @@
 	 				// we push the new danmaku into path 
 	 				if(j===old.length-1){
 	 					danPath[type][i+''].push(elem);
-	 					ele.addEventListener('animationed', function(){
-	 						danPath[type][i+''].splice(0,1);
-	 					});
+	 					ele.addEventListener('animationed', animatePath(type,i));
 	 					return i%itemY;
 	 				}
 	 			}
 	 		}else{
 	 			// if the path is empty right now. 
 	 			danPath[type][i+''].push(elem);
-	 			elem.addEventListener('animationed', function(){
-	 				danPath[type][i+''].splice(0,1);
-	 			});
+	 			elem.addEventListener('animationed', animatePath(type,i));
 	 			return i%itemY;
 	 		}
 	 	}
@@ -595,7 +612,74 @@
 	 	}
 	 	// move the danmaku 
 	 	singleDan.classList.add('icyplyr-danmaku-move');
-	 };
+	};
+
+	/**
+	 *	comment settings  
 	 */
+	 var commentBtn = this.element.getElementsByClassName('icyplyr-comment-icon')[0];
+	 var sendBtn = this.element.getElementsByClassName('icyplyr-comment-sendBtn')[0];
+	 // outer of opacity "progress"
+	 var commentOpacityWrap = this.element.getElementsByClassName('icyplyr-comment-opacitybar-wrap')[0];
+	 // show opacity progress bar 
+	 var commentOpacityThumbBar = this.element.getElementsByClassName('icyplyr-comment-opacitythumb')[0];
+	 // comment input area 
+	 var commentInput = this.element.getElementsByClassName('icyplyr-comment-input');
+
+	 // function handle sending comment
+	 // enconde comment content to avoid execution of fake html 
+	 var htmlEncode = function(text){
+	 	return text.replace(/&/g, "&amp;")
+	 			   .replace(/</g, "&lt;")
+	 			   .replace(/>/g, "&gt")
+	 			   .replace(/"/g, "&quot")
+	 			   .replace(/\//g, "&#x2f;")
+	 			   .replace(/'/g, "&#x27");
+	 }; 
+	 var sendComment = function(){
+	 	if(!commentInput.value.replace(/^\s+|\s+$/g,'')){
+	 		// if the comment is empty ..... 
+	 		// trim the comment, to make it work in IE, use regular expression instead of trim() method from ES5
+	 		alert('Please type comment content before send.');
+	 		return;
+	 	}
+	 	// Object for storing comment 
+	 	var commentObj = {
+	 		text: commentInput.value,
+	 		time: this.video.currentTime
+	 		// add opacity here 
+	 	};
+	 	var xhr = new XMLHttpRequest();
+	 	// handle post danmaku 
+	 	xhr.onreadystatechange = function(){
+		 	if(xhr.readystatus === 4){
+		 		// if the respond content finish loading 
+		 		// check the status of the respond
+		 		if(xhr.status>=200 && xhr.status<300){
+		 			// if the request is successful get the respond string to JSON format 
+		 			var respondContent = JSON.parse(xhr.responseText);
+		 			if(respondContent.fyi!==1){
+		 				// something still wrong ...
+		 				alert(respondContent.msg);
+		 			}else{
+		 				// otherwise show some message 
+		 				console.log('POST danmaku', JSON.parse(xhr.responseText));
+		 				
+		 			}
+		 		}else{
+		 			console.log('Request failed...' + xhr.status);
+		 		}
+		 	}
+	 	};
+	 	xhr.open('post', this.options.danmaku.api, true);
+	 	xhr.send(JSON.stringify(commentObj));
+
+	 	commentInput.value = ''; // clear input area
+	 	this.dan.splice(this.danIndex, 0, commentObj);
+	 	this.danIndex++;
+	 	this.danmakuIn(htmlEncode(commentObj.text), commentObj.type);
+
+	 };
+	 
 window.IcyPlayer = IcyPlayer;
 })();
