@@ -114,9 +114,46 @@
                 '<video class="icyplyr-video" width="320px" height="180px">' +
                     '<source src="1-hourWorkingBGM.mp4" type="video/mp4">' +
                 '</video>' +
+                '<div class="icyplyr-danmaku-container"></div>' + 
             '</div>'+
-            '<div class="icyplyr-danmaku-container"></div>' + 
-            '<div class="icyplyr-controller-maks"></div>' +
+            		'<div class="icyplyr-comment-box">' + 
+            			'<div class="comment-input-wrap">' +
+							'<div class="icyplyr-comment-bar">' + 
+								'<input class="icyplyr-comment-input" name="comment-content" type="text" placeholder=" Press ENTER to send">' + 
+							'</div>' +
+							'<div class="comment-send-wrap">' + 
+								'<button class="plyr-icon icyplyr-comment-sendBtn">' +
+									getSvg('send') + 
+								'</button>' +
+							'</div>' + 
+						'</div>' + 
+						'<div class="icyplyr-comment-setting-wrap">' +
+							'<span class="comment-setting-label">' + 
+								'Opacity:' +
+							'</span>' + 
+							'<div class="icyplyr-comment-opacitybar-wrap">' + 
+								'<span class="icyplyr-comment-opacity-thumb></span>' + 
+							'</div>' +
+							'<div class="icyplyr-comment-wrap">' +
+								'<div class="comment-type-wrap">' +
+									// '<span>Type</span>' + 
+									'<label class="comment-type">' + 
+										'<input class="danmaku-pos-option" type="radio" name="icyplyr-danmaku-type" value="top">' +
+									'<span>Top</span>' + 
+									'</label>' + 
+									'<label class="comment-type">' + 
+										'<input class="danmaku-pos-option" type="radio" name="icyplyr-danmaku-type" value="fly">' +
+										'<span>Moving</span>' + 
+									'</label>' + 
+									'<label class="comment-type">' + 
+										'<input class="danmaku-pos-option" type="radio" name="icyplyr-danmaku-type" value="bottom">' +
+										'<span>Bottom</span>' + 
+									'</label>' + 
+								'</div>' +  
+							'</div>' + 
+						'</div>' + 
+					'</div>' + 
+            // '<div class="icyplyr-controller-maks"></div>' +
             '<div class="icyplyr-controller">' + 
             	'<button class="play-button plyr-icon">' + 
 	            			getSvg('play') +
@@ -147,38 +184,22 @@
 						'<span class="playtime"><span class="icyplyr-played">00:00</span>/<span class="icyplyr-totaltime">00:00</span></span>' +
 					'</div>' +
 				'</div>' +
-				'<div class="icyplyr-comment-outer">' +
-					'<div class="icyplyr-comment-wrap">' +
-					'<button class="plyr-icon icyplyr-comment-icon">' +
-						getSvg('comment') + 
-					'</button>' + 
-					'</div>' +
-				'</div>' + 
+				'<div class="icyplyr-comment-out">' +
+					// '<div class="icyplyr-comment-wrap">' +
+					'<div class="icyplyr-comment-outer">' +
+						'<div class="icyplyr-comment-wrap">' +
+							'<button class="plyr-icon icyplyr-comment-icon">' +
+								getSvg('comment') + 
+							'</button>' + 
+						'</div>' +
+					'</div>' + 
+				'</div>' +
 				'<div class="icyplyr-full">' +
 					'<div class="icyplyr-full-wrap">' +
 						'<button class="plyr-icon icyplyr-full-icon">' + 
 							getSvg('full') +
 						'</button>' +
 					'</div>' +
-				'</div>' + 
-			'</div>' +
-			'<div class="icyplyr-comment-out">' +
-				'<div class="icyplyr-comment-wrap">' + 
-					'<div class="icyplyr-comment-bar">' + 
-						'<input class="icyplyr-comment-input" name="comment-content" type="text">press Enter to send comments</input>' + 
-					'</div>' +
-					'<button class="icyplyr-comment-sendBtn">' +
-						getSvg('send') + 
-					'</button>' +
-					'</div>' + 
-					'<div class="icyplyr-comment-setting-wrap">' +
-						'<span class="comment-setting-label">' + 
-							'comment opacity:' +
-						'</span>' + 
-						'<div class="icyplyr-comment-opacitybar-wrap">' + 
-							'<span class="icyplyr-comment-opacity-thumb></span>' + 
-						'</div>' +
-					'</div>' + 
 				'</div>' + 
 			'</div>' +
 		'</div>';
@@ -473,13 +494,198 @@
 		 		}
 		 	}
 		 }.bind(this));
+
+		 /**
+		  * Toggle the danmaku input area 
+		  */ 
+		 var commentBtn = this.element.getElementsByClassName('icyplyr-comment-icon')[0];
+		 var commentSettingBox = this.element.getElementsByClassName('icyplyr-comment-box')[0];
+		 commentBtn.addEventListener('click', function(){
+		 	commentSettingBox.classList.toggle('icyplyr-comment-open');
+		 });
+		 //var sendCommentBtn = this.element.getElementsByClassName('icyplyr-comment-sendBtn')[0];
+
+		/**
+		 *	control danmaku
+		 */
+	 	var danContainer = this.element.getElementsByClassName('icyplyr-danmaku-container')[0];
+	 	var danWidth;		 
+	 	var DAN_HEIGHT = 30;
+	 	var containerHeight;
+	 	var containerWidth;
+	 	var danPath = {
+	 		'top' : {},
+	 		'fly' : {},
+	 		'bottom' : {}
+	 	}; // container to store danmaku 
+
+	 	var danItemRight = function(elem){
+	 		return danContainer.getBoundingClientRect().right - elem.getBoundingClientRect().right;
+	 	};
+
+	 	var danSpeed = function(elem){
+	 		return (danWidth + elem.offsetWidth)/5;
+	 	};
+	 	// method dealing with danmaku position
+	 	// change this method  
+
+	 	// for use in animateioned event 
+	 	var animatePath = function(type, i){
+	 		danPath[type][i+''].splice(0,1);
+	 	};
+	 	function getPath(elem, type){
+	 		// first check if the path is empty now
+	 		console.log(danPath);
+	 		console.log(elem);
+	 		console.log(type);
+	 		for(var i=0; ;i++){
+	 			var old = danPath[type][i+''];
+	 			if( old && old.length){
+	 				for(var j=0; j<old.length; j++){
+	 					var danRight = danItemRight(old) - 10;
+	 					if(danRight<=0) break;
+	 					// when we reach the final one, 
+	 					// we push the new danmaku into path 
+	 					if(j===old.length-1){
+	 						danPath[type][i+''].push(elem);
+	 						ele.addEventListener('animationed', animatePath(type,i));
+	 						return i%itemY;
+	 					}
+	 				}
+	 			}else{
+	 				// if the path is empty right now. 
+	 				danPath[type][i+''] = [elem];
+	 				console.log(danPath[type][i+'']);
+	 				elem.addEventListener('animationed', animatePath(type,i));
+	 				return i%itemY;
+	 			}
+	 		}
+	 	}
+
+	 	this.danmakuBegin = function(text, pos){
+	 		var singleDan = document.createElement('div');
+	 		singleDan.innerHTML = text;
+	 		containerHeight = danContainer.offsetHeight;
+	 		containerWidth = danContainer.offsetWidth;
+	 		itemY = parseInt(containerHeight/DAN_HEIGHT);
+	 		singleDan.classList.add('icyplyr-comment-'+pos.toLowerCase());
+
+	 		// sent the danmaku 
+	 		console.log(singleDan);
+	 		danContainer.appendChild(singleDan);
+	 		switch(pos){
+	 			case 'top':
+	 				singleDan.style.top = DAN_HEIGHT*getPath(singleDan, 'top') + 'px';
+	 				singleDan.addEventListener('animationend', function(){
+	 					danContainer.removeChild(singleDan);
+	 					console.log('removed!');
+	 				});
+	 				break;
+	 			case 'fly':
+	 				singleDan.style.top = DAN_HEIGHT*getPath(singleDan, 'fly') + 'px';
+	 				singleDan.style.width = (singleDan.offsetWidth + 1) + 'px';
+	 				// move the item through the danContainer 
+	 				singleDan.style.transform = 'translateX' + '(-' + danWidth + 'px)';
+	 				singleDan.addEventListener('animationend', function(){
+	 					danContainer.removeChild(singleDan);
+	 				});
+	 				break;
+	 			case 'bottom':
+	 				singleDan.style.bottom = DAN_HEIGHT*getPath(singleDan, 'bottom') + 'px';
+	 				singleDan.addEventListener('animationend', function(){
+	 					danContainer.removeChild(singleDan);
+	 				});
+	 				break;
+	 			default:
+	 				console.error('Can not handle danmaku type ' + pos);
+	 		}
+	 		// move the danmaku 
+	 		singleDan.classList.add('icyplyr-danmaku-move');
+		};
+
+		/**
+		 *	comment settings  
+		 */
+		 // var commentBtn = this.element.getElementsByClassName('icyplyr-comment-icon')[0]; already defined 
+		 var sendBtn = this.element.getElementsByClassName('icyplyr-comment-sendBtn')[0];
+		 // outer of opacity "progress"
+		 var commentOpacityWrap = this.element.getElementsByClassName('icyplyr-comment-opacitybar-wrap')[0];
+	 	// show opacity progress bar 
+		 var commentOpacityThumbBar = this.element.getElementsByClassName('icyplyr-comment-opacitythumb')[0];
+		 // comment input area 
+		 var commentInput = this.element.getElementsByClassName('icyplyr-comment-input')[0];
+		 // get comment position option value 
+
+		 // function handle sending comment
+		 // enconde comment content to avoid execution of fake html 
+		 var htmlEncode = function(text){
+		 	return text.replace(/&/g, "&amp;")
+		 			   .replace(/</g, "&lt;")
+		 			   .replace(/>/g, "&gt")
+		 			   .replace(/"/g, "&quot")
+		 			   .replace(/\//g, "&#x2f;")
+		 			   .replace(/'/g, "&#x27");
+		 }; 
+		
+		//sendBtn.addEventListener('click',sendComment);
+
+		function sendComment(){
+		 	if(!commentInput || !commentInput.value.replace(/^\s+|\s+$/g,'')){
+		 		// if the comment is empty ..... 
+	 		// trim the comment, to make it work in IE, use regular expression instead of trim() method from ES5
+	 		alert('Please type comment content before send.');
+	 		return;
+	 		}
+	 	// Object for storing comment 
+	 		//var typeOpt = this.element.querySelector('input[name="icyplyr-danmaku-type"]:checked').value;
+	 		var commentObj = {
+	 			text: commentInput.value,
+	 			time: this.video.currentTime,
+	 			type: this.element.querySelector('input[name="icyplyr-danmaku-type"]:checked').value
+	 			// add opacity here 
+	 		};
+	 		/**
+	 		// deal with backend later 
+	 		var xhr = new XMLHttpRequest();
+	 	// handle post danmaku 
+	 		xhr.onreadystatechange = function(){
+			 	if(xhr.readystatus === 4){
+			 		// if the respond content finish loading 
+		 		// check the status of the respond
+			 		if(xhr.status>=200 && xhr.status<300){
+			 			// if the request is successful get the respond string to JSON format 
+		 				var respondContent = JSON.parse(xhr.responseText);
+			 			if(respondContent.fyi!==1){
+		 					// something still wrong ...
+		 					alert(respondContent.msg);
+		 				}else{
+		 					// otherwise show some message 
+		 					console.log('POST danmaku', JSON.parse(xhr.responseText));	
+		 				}
+		 			}else{
+		 				console.log('Request failed...' + xhr.status);
+		 			}
+		 		}
+	 		};
+	 		xhr.open('post', this.options.danmaku.api, true);
+	 		xhr.send(JSON.stringify(commentObj));
+
+	 		commentInput.value = ''; // clear input area
+	 		this.dan.splice(this.danIndex, 0, commentObj);
+	 		this.danIndex++;
+	 		*/
+	 		this.danmakuBegin(htmlEncode(commentObj.text), commentObj.type); 
+	 	}
+
+	 	// add event listenser to send comment button 
+	 	sendBtn.addEventListener('click', sendComment.bind(this));
 	};
 
 	/** 
 	 *	Play() method 
 	 */
 	IcyPlayer.prototype.play = function(){
-		if(this.video.paused){
+			if(this.video.paused){
 			this.shouldPause = false;
 			this.progUpdater('volume', this.video.volume, 'width');
 			this.playButton.innerHTML = getSvg('pause');
@@ -498,7 +704,7 @@
 	 */
 
 	IcyPlayer.prototype.pause = function(){
-	 	if(!this.shouldPause || this.ended){
+		 	if(!this.shouldPause || this.ended){
 	 		this.shouldPause = true;
 	 		this.ended = false;
 
@@ -516,170 +722,9 @@
 	 *  Then hander the customize event. 
 	 */
 	IcyPlayer.prototype.bindEvent = function(name, func){
-		if(typeof func === 'function'){
+			if(typeof func === 'function'){
 			this.event[name].push(func);
 		}
 	};
-
-	/**
-	 *	control danmaku
-	 *
-	 */
-	 	
-	 var danContainer = this.element.getElementsByClassName('icyplyr-danmaku-container')[0];
-	 var danWidth;		 
-	 var DAN_HEIGHT = 30;
-	 var containerHeight;
-	 var containerWidth;
-	 var danPath = {
-	 	top : {},
-	 	fly : {},
-	 	bottom : {}
-	 }; // container to store danmaku 
-
-	 var danItemRight = function(elem){
-	 	return danContainer.getBoundingClientRect().right - elem.getBoudingClientRect().right;
-	 };
-
-	 var danSpeed = function(elem){
-	 	return (danWidth + elem.offsetWidth)/5;
-	 };
-	 // method dealing with danmaku position
-	 // change this method  
-
-	 // for use in animateioned event 
-	 var animatePath = function(type, i){
-	 	danPath[type][i+''].splice(0,1);
-	 };
-	 var getPath = function(elem, type){
-	 	// first check if the path is empty now
-	 	for(var i=0; ;i++){
-	 		var old = danPath[type][i+''];
-	 		if( old && old.length){
-	 			for(var j=0; j<old.length; j++){
-	 				var danRight = danItemRight(old) - 10;
-	 				if(danRight<=0) break;
-	 				// when we reach the final one, 
-	 				// we push the new danmaku into path 
-	 				if(j===old.length-1){
-	 					danPath[type][i+''].push(elem);
-	 					ele.addEventListener('animationed', animatePath(type,i));
-	 					return i%itemY;
-	 				}
-	 			}
-	 		}else{
-	 			// if the path is empty right now. 
-	 			danPath[type][i+''].push(elem);
-	 			elem.addEventListener('animationed', animatePath(type,i));
-	 			return i%itemY;
-	 		}
-	 	}
-	 };
-
-	 this.danmakuBegin = function(text, color, pos){
-	 	var singleDan = document.createElement('<div>');
-	 	singleDan.innerHTML = text;
-	 	containerHeight = danContainer.offsetHeight;
-	 	containerWidth = danContainer.offsetWidth;
-	 	itemY = parseInt(containerHeight/DAN_HEIGHT);
-
-	 	// sent the danmaku 
-	 	danContainer.appendChild(item);
-	 	switch(pos){
-	 		case 'top':
-	 			singleDan.style.top = DAN_HEIGHT*getPath(singleDan, top) + 'px';
-	 			singleDan.addEventListener('animationed', function(){
-	 				danContainer.removeChild(singleDan);
-	 			});
-	 			break;
-	 		case 'right':
-	 			singleDan.style.top = DAN_HEIGHT*getPath(singleDan, right) + 'px';
-	 			singleDan.style.width = (singleDan.offsetWidth + 1) + 'px';
-	 			// move the item through the danContainer 
-	 			singleDan.style.transform = 'translateX' + '(-' + danWidth + 'px)';
-	 			singleDan.addEventListener('animationed', function(){
-	 				danContainer.removeChild(singleDan);
-	 			});
-	 			break;
-	 		case 'bottom':
-	 			singleDan.sytle.bottom = DAN_HEIGHT*getPath(singleDan, bottom) + 'px';
-	 			singleDan.addEventListener('animationed', function(){
-	 				danContainer.removeChild(singleDan);
-	 			});
-	 			break;
-	 		default:
-	 			console.error('Can not handle danmaku type ' + type);
-	 	}
-	 	// move the danmaku 
-	 	singleDan.classList.add('icyplyr-danmaku-move');
-	};
-
-	/**
-	 *	comment settings  
-	 */
-	 var commentBtn = this.element.getElementsByClassName('icyplyr-comment-icon')[0];
-	 var sendBtn = this.element.getElementsByClassName('icyplyr-comment-sendBtn')[0];
-	 // outer of opacity "progress"
-	 var commentOpacityWrap = this.element.getElementsByClassName('icyplyr-comment-opacitybar-wrap')[0];
-	 // show opacity progress bar 
-	 var commentOpacityThumbBar = this.element.getElementsByClassName('icyplyr-comment-opacitythumb')[0];
-	 // comment input area 
-	 var commentInput = this.element.getElementsByClassName('icyplyr-comment-input');
-
-	 // function handle sending comment
-	 // enconde comment content to avoid execution of fake html 
-	 var htmlEncode = function(text){
-	 	return text.replace(/&/g, "&amp;")
-	 			   .replace(/</g, "&lt;")
-	 			   .replace(/>/g, "&gt")
-	 			   .replace(/"/g, "&quot")
-	 			   .replace(/\//g, "&#x2f;")
-	 			   .replace(/'/g, "&#x27");
-	 }; 
-	 var sendComment = function(){
-	 	if(!commentInput.value.replace(/^\s+|\s+$/g,'')){
-	 		// if the comment is empty ..... 
-	 		// trim the comment, to make it work in IE, use regular expression instead of trim() method from ES5
-	 		alert('Please type comment content before send.');
-	 		return;
-	 	}
-	 	// Object for storing comment 
-	 	var commentObj = {
-	 		text: commentInput.value,
-	 		time: this.video.currentTime
-	 		// add opacity here 
-	 	};
-	 	var xhr = new XMLHttpRequest();
-	 	// handle post danmaku 
-	 	xhr.onreadystatechange = function(){
-		 	if(xhr.readystatus === 4){
-		 		// if the respond content finish loading 
-		 		// check the status of the respond
-		 		if(xhr.status>=200 && xhr.status<300){
-		 			// if the request is successful get the respond string to JSON format 
-		 			var respondContent = JSON.parse(xhr.responseText);
-		 			if(respondContent.fyi!==1){
-		 				// something still wrong ...
-		 				alert(respondContent.msg);
-		 			}else{
-		 				// otherwise show some message 
-		 				console.log('POST danmaku', JSON.parse(xhr.responseText));
-		 				
-		 			}
-		 		}else{
-		 			console.log('Request failed...' + xhr.status);
-		 		}
-		 	}
-	 	};
-	 	xhr.open('post', this.options.danmaku.api, true);
-	 	xhr.send(JSON.stringify(commentObj));
-
-	 	commentInput.value = ''; // clear input area
-	 	this.dan.splice(this.danIndex, 0, commentObj);
-	 	this.danIndex++;
-	 	this.danmakuIn(htmlEncode(commentObj.text), commentObj.type);
-
-	 };
-	 
 window.IcyPlayer = IcyPlayer;
 })();
