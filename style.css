@@ -93,7 +93,7 @@
   .icyplyr .icyplyr-comment-box {
     transform: scale(0);
     position: absolute;
-    top: 75%;
+    top: calc(100% - 200px);
     background-color: #aaa;
     padding: 5px 10px 10px;
     display: flex;
@@ -115,6 +115,9 @@
         border: none;
         padding: 5px 10px 5px 10px;
         outline: none; }
+    .icyplyr .icyplyr-comment-box.icyplyr-remove-box {
+      transform: scale(0);
+      transition: all 0.5s ease-in-out; }
     .icyplyr .icyplyr-comment-box span {
       display: inline-block;
       padding: 5px 5px; }
@@ -125,7 +128,8 @@
     top: 0;
     bottom: 0;
     left: 0;
-    right: 0; }
+    right: 0;
+    font-weight: 800; }
     .icyplyr .icyplyr-danmaku-container .icyplyr-comment-top {
       display: inline-block;
       position: absolute;
@@ -135,6 +139,8 @@
       .icyplyr .icyplyr-danmaku-container .icyplyr-comment-top.icyplyr-danmaku-move {
         will-change: visibility;
         animation: static-danmaku 4s linear; }
+    .icyplyr .icyplyr-danmaku-container .icyplyr-stop-animation {
+      animation-play-state: paused; }
     .icyplyr .icyplyr-danmaku-container .icyplyr-comment-bottom {
       display: inline-block;
       position: absolute;
@@ -150,7 +156,7 @@
       width: 100%; }
       .icyplyr .icyplyr-danmaku-container .icyplyr-comment-fly.icyplyr-danmaku-move {
         will-change: transform;
-        animation: moving-danmaku 4s linear; }
+        animation: moving-danmaku 8s linear; }
     .icyplyr .icyplyr-danmaku-container .icyplyr-danmaku-move.icyplyr-danmaku-top, .icyplyr .icyplyr-danmaku-container .icyplyr-danmaku-move.icyplyr-danmaku-bottom {
       animation: static-danmaku 6s linear; }
     .icyplyr .icyplyr-danmaku-container .icyplyr-danmaku-move.icyplyr-danmaku-fly {
