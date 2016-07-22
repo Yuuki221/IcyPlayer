@@ -101,8 +101,7 @@
 	  		}
 	  	}
 	  }; 
-	// start of Player's prototype 
-	
+	// start of Player's prototype
 	/** method load(); 
 	 *  load the view of player 
 	 */
@@ -119,7 +118,7 @@
             		'<div class="icyplyr-comment-box">' + 
             			'<div class="comment-input-wrap">' +
 							'<div class="icyplyr-comment-bar">' + 
-								'<input class="icyplyr-comment-input" name="comment-content" type="text" placeholder=" Press ENTER to send">' + 
+								'<input class="icyplyr-comment-input" name="comment-content" type="text" placeholder=" click button to send">' + 
 							'</div>' +
 							'<div class="comment-send-wrap">' + 
 								'<button class="plyr-icon icyplyr-comment-sendBtn">' +
@@ -129,16 +128,13 @@
 						'</div>' + 
 						'<div class="icyplyr-comment-setting-wrap">' +
 							'<span class="comment-setting-label">' + 
-								'Opacity:' +
+								'Danmaku Position:' +
 							'</span>' + 
-							'<div class="icyplyr-comment-opacitybar-wrap">' + 
-								'<span class="icyplyr-comment-opacity-thumb></span>' + 
-							'</div>' +
 							'<div class="icyplyr-comment-wrap">' +
 								'<div class="comment-type-wrap">' +
 									// '<span>Type</span>' + 
 									'<label class="comment-type">' + 
-										'<input class="danmaku-pos-option" type="radio" name="icyplyr-danmaku-type" value="top">' +
+										'<input class="danmaku-pos-option" type="radio" name="icyplyr-danmaku-type" value="top" checked>' +
 									'<span>Top</span>' + 
 									'</label>' + 
 									'<label class="comment-type">' + 
@@ -475,7 +471,13 @@
 		 		}else if (this.element.mozRequestFullScreen){
 		 			this.element.mozRequestFullScreen();
 		 		}else if (this.element.webkitRequestFullscreen){
-		 			this.element.webkitRequestFullscreen();
+		 			// For security reason some browser block keyboard input while in full screen mode 
+		 			// BUGGY Safari for full-screen input .....
+		 			this.element.webkitRequestFullscreen(Element.ALLOW_KEYBOARD_INPUT);
+		 			commentBtn.style.visibility = 'hidden';
+		 			if(commentSettingBox.classList.contains('icyplyr-comment-open')){
+		 				commentSettingBox.classList.add('icyplyr-remove-box');
+		 			}
 		 		}
 		 	}else{
 		 		// if it is already in full screen mode, then toggle it back to small window
@@ -490,7 +492,11 @@
 		 			document.msExitFullscreen();
 		 		}else if(document.webkitCancelFullScreen){
 		 			// console.log("worked 4");
+		 			commentBtn.style.visibility = 'visible';
 		 			document.webkitCancelFullScreen();
+		 			if(commentSettingBox.classList.contains('icyplyr-comment-open')){
+		 				commentSettingBox.classList.remove('icyplyr-remove-box');
+		 			}
 		 		}
 		 	}
 		 }.bind(this));
@@ -500,8 +506,18 @@
 		  */ 
 		 var commentBtn = this.element.getElementsByClassName('icyplyr-comment-icon')[0];
 		 var commentSettingBox = this.element.getElementsByClassName('icyplyr-comment-box')[0];
+		 var commentBoxSafariFull = function(){
+		 	commentSettingBox.innerHTML = "Sorry, Safari does not allow for fullscreen keyboard input, exit fullscreen to send comments.";
+		 };
 		 commentBtn.addEventListener('click', function(){
 		 	commentSettingBox.classList.toggle('icyplyr-comment-open');
+		 	if(commentSettingBox.classList.contains('icyplyr-comment-open')){
+		 		// cancel hotkey events when have comment box open
+		 		document.removeEventListener('keydown', hotkeyDown);
+		 		commentInput.focus();
+		 	}else{
+		 		document.addEventListener('keydown', hotkeyDown);
+		 	}
 		 });
 		 //var sendCommentBtn = this.element.getElementsByClassName('icyplyr-comment-sendBtn')[0];
 
@@ -569,6 +585,8 @@
 	 		containerWidth = danContainer.offsetWidth;
 	 		itemY = parseInt(containerHeight/DAN_HEIGHT);
 	 		singleDan.classList.add('icyplyr-comment-'+pos.toLowerCase());
+	 		singleDan.classList.add('icyplyr-comment');
+
 
 	 		// sent the danmaku 
 	 		console.log(singleDan);
@@ -608,8 +626,6 @@
 		 */
 		 // var commentBtn = this.element.getElementsByClassName('icyplyr-comment-icon')[0]; already defined 
 		 var sendBtn = this.element.getElementsByClassName('icyplyr-comment-sendBtn')[0];
-		 // outer of opacity "progress"
-		 var commentOpacityWrap = this.element.getElementsByClassName('icyplyr-comment-opacitybar-wrap')[0];
 	 	// show opacity progress bar 
 		 var commentOpacityThumbBar = this.element.getElementsByClassName('icyplyr-comment-opacitythumb')[0];
 		 // comment input area 
@@ -625,11 +641,29 @@
 		 			   .replace(/"/g, "&quot")
 		 			   .replace(/\//g, "&#x2f;")
 		 			   .replace(/'/g, "&#x27");
-		 }; 
+		 };
+
+		 this.controlAnimation = function(){
+		 	var commentItems = document.getElementsByClassName('icyplyr-comment');
+		 	if(this.video.paused){
+		 		for(var i=0; i<commentItems.length; i++){
+		 			commentItems[i].classList.add('icyplyr-stop-animation');
+		 		}
+		 	}else{
+		 		for(var j=0; j<commentItems.length; j++){
+		 			if(commentItems[j].classList.contains('icyplyr-stop-animation')){
+		 				commentItems[j].classList.remove('icyplyr-stop-animation');
+		 			}
+		 		}
+
+		 	}
+		 };
 		
 		//sendBtn.addEventListener('click',sendComment);
-
 		function sendComment(){
+			console.log('in send Comment method');
+			console.log(this.video);
+			console.log(this);
 		 	if(!commentInput || !commentInput.value.replace(/^\s+|\s+$/g,'')){
 		 		// if the comment is empty ..... 
 	 		// trim the comment, to make it work in IE, use regular expression instead of trim() method from ES5
@@ -638,11 +672,13 @@
 	 		}
 	 	// Object for storing comment 
 	 		//var typeOpt = this.element.querySelector('input[name="icyplyr-danmaku-type"]:checked').value;
+	 		// console.log(this);
+	 		// when come into the key-value, the this value become windwo instead of IcyPlayer ??
 	 		var commentObj = {
-	 			text: commentInput.value,
-	 			time: this.video.currentTime,
-	 			type: this.element.querySelector('input[name="icyplyr-danmaku-type"]:checked').value
-	 			// add opacity here 
+	 				text: commentInput.value,
+	 				time: this.video.currentTime,
+	 				type: this.element.querySelector('input[name="icyplyr-danmaku-type"]:checked').value
+	 				// add opacity here 
 	 		};
 	 		/**
 	 		// deal with backend later 
@@ -669,17 +705,66 @@
 	 		};
 	 		xhr.open('post', this.options.danmaku.api, true);
 	 		xhr.send(JSON.stringify(commentObj));
-
+			*/
 	 		commentInput.value = ''; // clear input area
-	 		this.dan.splice(this.danIndex, 0, commentObj);
-	 		this.danIndex++;
-	 		*/
+	 		//this.dan.splice(this.danIndex, 0, commentObj);
+	 		// this.danIndex++;
 	 		this.danmakuBegin(htmlEncode(commentObj.text), commentObj.type); 
 	 	}
 
+
 	 	// add event listenser to send comment button 
 	 	sendBtn.addEventListener('click', sendComment.bind(this));
+	 	/**
+	 	 *	To deal with hot keys
+	 	 */
+	 	var hotkeyDown = function(e){
+	 		var event = e || window.event;
+	 		var percentage;
+	 		switch(event.keyCode){
+	 			case 32:
+	 				event.preventDefault();
+	 				this.toggle();
+	 				break;
+	 			case 37:
+	 				event.preventDefault();
+	 				this.video.currentTime = this.video.currentTime - 10;
+	 				break;
+	 			case 39: 
+	 				event.preventDefault();
+	 				this.video.currentTime = this.video.currentTime + 10;
+	 				break;
+	 			case 38:
+	 				event.preventDefault();
+	 				percentage = this.video.volume + 0.2;
+	 				percentage = percentage > 0 ? percentage : 0;
+	 				percentage = percentage < 1 ? percentage : 1;
+	 				this.progUpdater('volume', percentage, 'width');
+	 				this.video.volume = percentage;
+	 				this.switchVolumeIcon();
+	 				if(this.video.muted){
+	 					this.video.muted = false;
+	 				}
+	 				break;
+	 			case 40:
+	 				event.preventDefault();
+	 				percentage = this.video.volume - 0.2;
+	 				percentage = percentage > 0 ? percentage : 0;
+	 				percentage = percentage < 1 ? percentage : 1;
+	 				this.progUpdater('volume', percentage, 'width');
+	 				this.video.volume = percentage;
+	 				this.switchVolumeIcon();
+	 				if(this.video.muted){
+	 					this.video.muted = false;
+	 				}
+	 				break;
+	 		}
+	 	}.bind(this);
+	 	document.addEventListener('keydown', hotkeyDown);
+
 	};
+
+
 
 	/** 
 	 *	Play() method 
@@ -690,11 +775,13 @@
 			this.progUpdater('volume', this.video.volume, 'width');
 			this.playButton.innerHTML = getSvg('pause');
 			this.video.play();
+			this.controlAnimation();
 			// since the checking is removed when the video is paused
 			// we need to get it back when play it again 
 			this.detectPlayStatus();
 			this.trigger('play');
 		}
+
 		//var video = this.video; // make a local copy of the video 
 		//this.playButton.addEventListener('click', this.video.play());
 	};
@@ -710,6 +797,7 @@
 
 	 		this.playButton.innerHTML = getSvg('play');
 	 		this.video.pause();
+	 		this.controlAnimation();
 	 		this.clearTime(); 
 	 		// stop checking the status of playstatus when the video is stopped to be more efficient 
 	 		this.trigger('pause');
