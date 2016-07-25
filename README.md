@@ -21,7 +21,7 @@ More importantly, it has awesome __DANMAKU( 弹幕，live video comments )__ fun
 
 
 ## Use
-Attach the `IcyPlayer.js` and `style.css` file to your website or project. 
+Attach `IcyPlayer.js` and `style.css` files to your website or project. 
 
 ## Options 
 
