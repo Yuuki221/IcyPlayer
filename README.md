@@ -40,6 +40,7 @@ var input = {
 ## Future Improvements
 1. Make controller bar auto hide and show
 2. Add backend to store danmaku
-3. Add more options to the appearance of Player and Danmaku
+3. Handling video loading events 
+4. Add more options to the appearance of Player and Danmaku
 
 
