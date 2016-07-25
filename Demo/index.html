@@ -1,0 +1,45 @@
+<!doctype html>
+<html>
+	<head>
+		<meta charset="UTF-8">
+		<title>IcyPlayer Demo</title>
+		<link href="style.css" rel="stylesheet" type="text/css">
+		<script src="IcyPlayer.js"></script>
+	</head>
+	<body>
+		<div class="whole-wrap">
+			<div class="title-description">
+				<h1>An HTML5, CSS3 and Javascript based video player</h1>
+				<p>
+					You can send comments to the video while watching the video, try this danmaku feature by clicking on the
+					comment button. It also support normal play, pause, volume and play time adjustment. 
+					<br><br>
+					Hot keys are also supported. For more details, please see Readme file. 
+				</p>
+			</div>
+			<div class="plyr-wrap-wrap">
+			</div>
+		</div>
+		<script>
+			var input = {
+				element : document.getElementsByClassName('plyr-wrap-wrap')[0],
+				url : 'TKLin.mp4'
+			};
+			var plyr = new IcyPlayer(input);
+			plyr.init();
+		</script>
+		<style>
+		body{
+			font-family: 'Helvetica Nenu', Helvetica, Arial, sans-serif;
+			background: #ededed;
+		}
+		.whole-wrap{
+			margin: 30px auto;
+			max-width: 40rem;
+		}
+		p{
+			color: #555;
+		}
+		</style>
+	</body>
+</html>

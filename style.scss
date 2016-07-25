@@ -1,0 +1,236 @@
+.icyplyr{
+	// gloable setting
+	position: relative;
+	overflow: hidden;
+	user-select: none;
+	line-height: 1;
+	min-width: 400px;
+	font-family: sans-serif;
+	font-weight: 100;
+	font-size: 12px;
+	width: 100%;
+	height: 100%;
+
+	// global icon setting
+	svg{
+		fill: #eee;
+	} 
+	span{
+		-webkit-user-select:none;
+	}
+	.plyr-icon{
+		position: relative;
+		width: 46px;
+		height: 38px;
+		outline: none;
+		border: none;
+		background-color: transparent;
+		cursor: pointer;
+		opacity: 0.6;
+		transition: all .2s ease-in-out;
+		display: inline-block;
+		padding: 10px;
+		//margin: 0 20px;
+		&:hover{
+			opacity:1;
+		}
+	}
+	.icyplyr-play-progress{
+		height: 38px;
+		will-change: width;
+		width: calc(100% - 160px);
+		& .icyplyr-play-bar-inner{
+			position: absolute;
+			border-radius: 50%;
+			cursor: pointer;
+			transition: all 0.3s ease-in-out;
+			transform: scale(0); // hide the thumb at first 
+		}
+		&:hover{
+			.icyplyr-play-bar-inner{
+				transform: scale(1); // when hover the bar the drag button will show up 
+				background-color: #aaa;
+			}
+		}
+	}
+	.icyplyr-play-progress{
+		margin-top: 15px;
+	}
+
+	.icyplyr-controller{
+		display: flex;
+		flex-direction: row;
+		padding: 0 20px 0 5px;
+		background-color: #333;
+		color: #eee;
+		bottom: 0;
+		//max-height: 50px;
+	}
+	.icyplyr-comment-icon{
+		top: 1.8px;
+	}
+
+	.icyplyr-volume{
+		display: flex;
+		flex-direction: row;
+		margin-right: 5px;
+		.icyplyr-volume-bar{
+			//padding: 10px;
+			margin-top: 17px;
+			//margin-right: 10px;
+			
+		}
+		.icyplyr-drag-wrap{
+			display: none;
+		}
+	}
+	.icyplyr-playtime{
+		display: inline-block;
+		margin: 0 0 0 0;
+		right: -5px;
+		text-align: center;
+		width: 100px;
+		padding-top: 13px;
+		.playtime{
+			padding: 10px 0 0 0;
+		}
+	}
+	.icyplyr-video-wrap{
+		position: relative;
+		width:100%;
+		height:100%;
+		.icyplyr-video{
+			width: 100%;
+			height: 100%;
+		}
+	}
+	.icyplyr-comment-outer, .icyplyr-playtime{
+		display:inline-block;
+	}
+	.icyplyr-volume-icon{
+		padding-left:0;
+		margin-right: 4px;
+		width: 46px;
+		left: -13px;
+		position: relative;
+	}
+	.icyplyr-volume-bar{
+		background-color: #eee;
+	}
+	.icyplyr-volume-control{
+		height: 38px;
+		width: 46px;
+		margin-right: 5px;
+		display: block;
+	}
+	.icyplyr-comment-box{
+		transform:scale(0);
+		position: absolute;
+		top: calc(100% - 200px);
+		background-color: #aaa;
+		padding: 5px 10px 10px;
+		display: flex;
+		flex-direction: column;
+		border-radius: 5px;
+		width: 200px;
+		left: calc(100% - 250px);
+		transition: all 0.5s ease-in-out;
+		&.icyplyr-comment-open{
+			transform: scale(1);
+		}
+		& .comment-input-wrap{
+			display: flex;
+			flex-direction: row;
+		}
+		.icyplyr-comment-bar{
+			padding: 5px 0 5px 0;
+			& input{
+				box-shadow: 0 0 1em #bbffff;
+				border-radius: 5px;
+				border: none;
+				padding: 5px 10px 5px 10px;
+				outline: none;
+			}
+		}
+		&.icyplyr-remove-box{
+			transform: scale(0);
+			transition: all 0.5s ease-in-out;
+		}
+		span{
+			display: inline-block;
+			padding: 5px 5px;
+		}
+	}
+
+	.icyplyr-danmaku-container{
+		position: absolute;
+		color: white;
+		font-size: 22px;
+		top: 0;
+		bottom: 0;
+		left: 0;
+		right: 0;
+		font-weight: 800;
+		.icyplyr-comment-top{
+			display: inline-block;
+			position: absolute;
+			width: 100%;
+			text-align: center;
+			visibility: hidden;
+			&.icyplyr-danmaku-move{
+				will-change: visibility;
+				animation: static-danmaku 4s linear;
+			}
+		}
+		.icyplyr-stop-animation{
+			animation-play-state: paused;
+		}
+		.icyplyr-comment-bottom{
+			display: inline-block;
+			position: absolute;
+			width: 100%;
+			text-align: center;
+			visibility: hidden;
+			&.icyplyr-danmaku-move{
+				will-change: visibility;
+				animation: static-danmaku 5s linear;
+			}
+		}
+		.icyplyr-comment-fly{
+			display: inline-block;
+			position: absolute;
+			width: 100%;
+			&.icyplyr-danmaku-move{
+				will-change: transform;
+				animation: moving-danmaku 8s linear;
+			}
+		}
+		.icyplyr-danmaku-move{
+			&.icyplyr-danmaku-top, &.icyplyr-danmaku-bottom{
+				animation: static-danmaku 6s linear;
+			}
+			&.icyplyr-danmaku-fly{
+				animation: moving-danmaku 6s linear;
+			}
+		}
+	}
+}
+.icyplyr:-webkit-full-screen{
+		width: 100%;
+		height: 100%;
+}
+
+@keyframes static-danmaku{
+	from{
+		visibility: visible;
+	}
+	to{
+		visibility: visible;
+	}
+}
+
+@keyframes moving-danmaku{
+	from{
+		transform: translateX(100%);
+	}
+}
