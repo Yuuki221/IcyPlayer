@@ -1,12 +1,15 @@
 /** @param {Object} option
- * urls, color, comment, 
+ * urls, element, 
  *
  */
+
 (function(options){
 	// constructor 
+	
 	var IcyPlayer = function(options){
 		this.element = options.element;
-		this.color = options.color;
+		//this.color = options.color;
+		this.videoScr = options.url;
 		// a value for check mobile devices 
 		this.isMobile = navigator.userAgent.match(/(iPad)|(iPhone)|(iPod)|(android)|(webOS)/i);
 
@@ -111,7 +114,7 @@
 			'<div class="icyplyr-video-wrap">' +
              	'<!-- video source -->' +
                 '<video class="icyplyr-video" width="320px" height="180px">' +
-                    '<source src="1-hourWorkingBGM.mp4" type="video/mp4">' +
+                    '<source src="' + this.videoScr + '" type="video/mp4">' +
                 '</video>' +
                 '<div class="icyplyr-danmaku-container"></div>' + 
             '</div>'+
